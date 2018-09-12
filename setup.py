@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 from platform import machine, system
+from pip._internal import main as pip
 
 if (system() != 'Windows'):
     sys.exit('Currently, the only supported OS for MindPong is Windows')
@@ -41,8 +42,8 @@ try:
         keywords='muse polycortex eeg concentration beta',
         packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-        install_requires=['pexpect', 'pyserial', 'numpy', 'wheel', 'pyMuse', ' PyQt4'],
-        dependency_links=[ 'https://github.com/PolyCortex/pyMuse/archive/ExtractMindPongApp.zip#egg=pyMuse'],
+        install_requires=['pexpect', 'pyserial', 'numpy', 'wheel', 'pyMuse'],
+        dependency_links=['https://github.com/PolyCortex/pyMuse/archive/ExtractMindPongApp.zip#egg=pyMuse'],
 
         entry_points={
             'console_scripts': [
@@ -50,6 +51,7 @@ try:
             ],
         },
     )
+    pip(['install', pyqt_link])
     print('\nINSTALLATION COMPLETED!')
 except:
     print "Unexpected error:", sys.exc_info()[0]
