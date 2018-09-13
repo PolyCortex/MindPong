@@ -1,8 +1,7 @@
+from os import path
 import sys
 from setuptools import setup, find_packages
-from setuptools.command.build_ext import build_ext as _build_ext
 from codecs import open
-from os import path
 from platform import machine, system
 from pip._internal import main as pip
 
@@ -22,16 +21,6 @@ here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
-
-class build_ext(_build_ext):
-    'to install numpy'
-    def finalize_options(self):
-        _build_ext.finalize_options(self)
-        # Prevent numpy from thinking it is still in its setup process:
-        __builtins__.__NUMPY_SETUP__ = False
-        print('This might take a while (approx 4-5 minutes). Do not exit')
-        import numpy
-        self.include_dirs.append(numpy.get_include())
 
 try:
     setup(
@@ -53,12 +42,13 @@ try:
         keywords='muse polycortex eeg concentration beta',
         packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
-        cmdclass={ 'build_txt': build_ext },
-        setup_requires=['numpy'],
 
         install_requires=['pexpect', 'pyserial', 'numpy', 'wheel', 'pyMuse'],
-        dependency_links=['https://github.com/PolyCortex/pyMuse/archive/ExtractMindPongApp.zip#egg=pyMuse'],
-        
+        dependency_links=[
+            'https://github.com/PolyCortex/pyMuse/archive/ExtractMindPongApp.zip#egg=pyMuse',
+            'https://files.pythonhosted.org/packages/f7/f3/90837bee8673a1bc658ed908601a8e35290acec297b0f487d1a59d08e5b1/numpy-1.15.1-cp27-none-win_amd64.whl'
+        ],
+
         entry_points={
             'console_scripts': [
                 'boatGUI=boatGUI:main',
@@ -70,4 +60,3 @@ try:
 except:
     print "Unexpected error:", sys.exc_info()[0]
     raise
-
