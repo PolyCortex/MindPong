@@ -1,0 +1,9 @@
+--index-url https://pypi.python.org/simple/
+
+pexpect 
+pyserial
+numpy
+https://github.com/PolyCortex/pyMuse/archive/ExtractMindPongApp.zip
+
+https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-win_amd64.whl; platform_system == "Windows" and platform_machine == "AMD64" 
+https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-win32.whl; platform_system == "Windows" and platform_machine == "x86" 
