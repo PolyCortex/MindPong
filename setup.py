@@ -8,11 +8,11 @@ from pip._internal import main as pip
 if (system() != 'Windows'):
     sys.exit('Currently, the only supported OS for MindPong is Windows')
 
-pyqt_link = ''
+architecture_info = ''
 if machine() == 'AMD64':
-    pyqt_link = 'https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-win_amd64.whl#egg=PyQt4'
+    architecture_info = 'win_amd64'
 elif machine() == 'x86':
-    pyqt_link = 'https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-win32.whl#egg=PyQt4'
+    architecture_info = 'win32'
 else:
     sys.exit('Your architecture is not compatible with any version of PyQt4. Sorry :(')
 
@@ -46,7 +46,9 @@ try:
         install_requires=['pexpect', 'pyserial', 'numpy', 'wheel', 'pyMuse'],
         dependency_links=[
             'https://github.com/PolyCortex/pyMuse/archive/ExtractMindPongApp.zip#egg=pyMuse',
-            'https://files.pythonhosted.org/packages/f7/f3/90837bee8673a1bc658ed908601a8e35290acec297b0f487d1a59d08e5b1/numpy-1.15.1-cp27-none-win_amd64.whl'
+            'https://files.pythonhosted.org/packages/f7/f3/90837bee8673a1bc658ed908601a8e35290acec297b0f487d1a59d08e5b1/numpy-1.15.1-cp27-none-'
+            + architecture_info
+            + '.whl'
         ],
 
         entry_points={
@@ -55,7 +57,10 @@ try:
             ],
         },
     )
-    pip(['install', pyqt_link])
+    pip([
+        'install',
+        'https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-' + architecture_info + '.whl#egg=PyQt4'
+    ])
     print('\nINSTALLATION COMPLETED!')
 except:
     print "Unexpected error:", sys.exc_info()[0]
