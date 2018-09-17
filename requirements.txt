@@ -1,5 +1,7 @@
 --index-url https://pypi.python.org/simple/
 
+setuptools
+
 # PyMuse dependencies : 
 git+git://github.com/ptone/pyosc.git@master
 matplotlib
@@ -9,6 +11,6 @@ pyserial
 
 # MindPong dependencies :
 pexpect 
-git+git://github.com/PolyCortex/pyMuse.git@ExtractMindPongApp
+git+git://github.com/PolyCortex/pyMuse.git@master
 https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-win_amd64.whl; platform_system == "Windows" and platform_machine == "AMD64" 
 https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/PyQt4-4.11.4-cp27-cp27m-win32.whl; platform_system == "Windows" and platform_machine == "x86" 

@@ -28,7 +28,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
 
-    install_requires=['pexpect', 'pyserial', 'numpy', 'wheel', 'pyMuse'],
+    install_requires=['pexpect', 'pyserial', 'numpy', 'pyMuse'],
 
     entry_points={
         'console_scripts': [
