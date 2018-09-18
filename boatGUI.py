@@ -1,14 +1,10 @@
 import sys
-import ctypes
 from PyQt4 import QtGui, QtCore
 import thread
 import time
-from datetime import datetime
 import pexpect
 import serial
-import struct
 from math import exp
-from random import randint
 import numpy as np
 
 
@@ -18,8 +14,6 @@ from pymuse.processes import Process
 from pymuse.pipeline import Analyzer
 
 MUSES = {'Muse 1': 'Muse-0CCD', 'Muse 2': 'Muse-201E', 'Muse 3': 'Muse-4E4E', 'Muse 4': 'Muse-7F68'}
-
-
 
 class Window(QtGui.QMainWindow):
     change_images = QtCore.pyqtSignal(float, float)
@@ -199,34 +193,6 @@ class Window(QtGui.QMainWindow):
         cmd = 'muse-io --osc osc.udp://localhost:5001 --device ' + muse_P1
         #cmd = ['muse-io', '--osc', 'osc.udp://localhost:5001', '--device', muse_P1]
         print cmd
-        """ pexpect n'est disponible que sur Linux/Unix...
-        try:
-            import subprocess
-            #self.connexion_muse_P1 = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            index = 0
-
-            #self.connexion_muse_P1 = pexpect.spawn(cmd)
-            #index = self.connexion_muse_P1.expect(connect_status)
-            #self.connexion_muse_P1.interact()
-            #print connect_status[index]
-            if index >= 1:
-                connected = False
-                self.connexion_muse_P1 = None
-            else:
-                connected = True
-        except Exception as e:
-            print e
-            connected = False
-            self.connexion_muse_P1 = None
-
-        if connected:
-            #self.Combo1.setDisabled(True)
-            #self.connect1_btn.setDisabled(True)
-            #self.unconnect1_btn.setEnabled(True)
-            self.connect1_btn.setStyleSheet("background-color: green")
-        else:
-            self.connect1_btn.setStyleSheet("background-color: red")
-        """
 
     def cb_unconnect1(self):
         # Needs to disconnect the Muse and verify that the ports have been closed
@@ -250,29 +216,6 @@ class Window(QtGui.QMainWindow):
         muse_P2 = MUSES[str(self.Combo2.currentText())]
         cmd = 'muse-io --osc osc.udp://localhost:5002 --device ' + muse_P2
         print cmd
-        """
-        try:
-            #self.connexion_muse_P2 = pexpect.spawn(cmd)
-            #index = self.connexion_muse_P2.expect(connect_status)
-            #print connect_status[index]
-            #if index >= 1:
-            #    connected = False
-            #    self.connexion_muse_P2 = None
-            #else:
-            #    connected = True
-        except Exception as e:
-            print e
-            connected = False
-            self.connexion_muse_P2 = None
-
-        if connected:
-            #self.Combo2.setDisabled(True)
-            #self.connect2_btn.setDisabled(True)
-            #self.unconnect2_btn.setEnabled(True)
-            self.connect2_btn.setStyleSheet("background-color: green")
-        else:
-            self.connect2_btn.setStyleSheet("background-color: red")
-        """
 
     def cb_unconnect2(self):
         # Needs to disconnect the Muse and verify that the ports have been closed
@@ -321,11 +264,8 @@ class Window(QtGui.QMainWindow):
             self.speed2_label.setPixmap(self.speed2_pixmap_5)
         if 0.8 <= dataP2 <= 1:
             self.speed2_label.setPixmap(self.speed2_pixmap_6)
-        print 'TOUT EST BEAU!'
 
         if self.serial_channel is not None: 
-            
-
             if dataP1 < self.borneMin:
                 dataP1 = self.borneMin
             if dataP2 < self.borneMin:
@@ -370,14 +310,12 @@ def update_data(update_frequency=20.0, gui=None, signal_P1=None, signal_P2=None)
 
                 if signal_P1.lock is not None:
                     signal_P1.lock.acquire()
-                #dP1 = signal_P1.data[0, -1]
                 dP1 = np.nanmean(signal_P1.data[:,-1])
                 if signal_P1.lock is not None:
                     signal_P1.lock.release()
 
                 if signal_P2.lock is not None:
                     signal_P2.lock.acquire()
-                #dP2 = signal_P2.data[0, -1]
                 dP2 = np.nanmean(signal_P2.data[:,-1])
                 if signal_P2.lock is not None:
                     signal_P2.lock.release()
@@ -399,12 +337,6 @@ def run_server(gui=None, port=5001, player_signal=None):
                                                   label_channels=['0', '1', '2', '3'])
     else:
         signal_concentration = player_signal
-
-    """try:
-        thread.start_new_thread(update_data, (update_frequency, gui, signal_concentration, signal_concentration.lock, player))
-    except:
-        print "Error: unable to start thread"
-    """
 
     signals['concentration'] = signal_concentration
 
