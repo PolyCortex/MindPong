@@ -10,6 +10,10 @@ MindPong is a fantastic EEG multiplayer game requiring two Muse headbands and an
 The necessary setup is a ping pong ball in a translucent plastic  tube with two fans at the edges of the tube. They are connected to an Arduino Uno wich is linked to a computer that is receiving the signal of two Muse headbands via bluetooth. We use [Muse Direct](http://www.choosemuse.com/direct/) to get beta waves from the headbands.
 
 ## Getting started
+### Prerequisites
+
+You must have Python 2.7 installed, Muse Direct and your operating system must be Windows.
+
 ### Installation of dependencies
 
 In order to install all the dependencies of this project just use pip.
