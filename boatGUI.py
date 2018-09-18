@@ -8,7 +8,7 @@ import pexpect
 import serial
 import struct
 from math import exp
-import random
+from random import randint
 import numpy as np
 
 
@@ -17,7 +17,8 @@ from pymuse.signals import MultiChannelSignal
 from pymuse.processes import Process
 from pymuse.pipeline import Analyzer
 
-MUSES = {'Muse 1': 'Muse-8BEF', 'Muse 2': 'Muse-7042', 'Muse 3': 'Muse-9957', 'Muse 4': 'Muse-4E4E'}
+MUSES = {'Muse 1': 'Muse-0CCD', 'Muse 2': 'Muse-201E', 'Muse 3': 'Muse-4E4E', 'Muse 4': 'Muse-7F68'}
+
 
 
 class Window(QtGui.QMainWindow):
@@ -27,6 +28,8 @@ class Window(QtGui.QMainWindow):
         super(Window, self).__init__()
         self.setWindowTitle("MindPong")
         self.home()
+        self.borneMin = 0.05
+        self.borneMax = 0.4
 
     def home(self):
         # Define dimensions - Only works on windows ...
@@ -289,56 +292,64 @@ class Window(QtGui.QMainWindow):
             print 'APPUYER SUR PLAY'
             return
 
-        if 0.0 <= dataP1 < 0.1:
+        if 0.0 <= dataP1 < 0.05:
             self.speed1_label.setPixmap(self.speed1_pixmap)
-        if 0.1 <= dataP1 < 0.2:
+        if 0.05 <= dataP1 < 0.1:
             self.speed1_label.setPixmap(self.speed1_pixmap_1)
-        if 0.2 <= dataP1 < 0.3:
+        if 0.1 <= dataP1 < 0.2:
             self.speed1_label.setPixmap(self.speed1_pixmap_2)
-        if 0.3 <= dataP1 < 0.45:
+        if 0.2 <= dataP1 < 0.3:
             self.speed1_label.setPixmap(self.speed1_pixmap_3)
-        if 0.45 <= dataP1 < 0.7:
+        if 0.3 <= dataP1 < 0.5:
             self.speed1_label.setPixmap(self.speed1_pixmap_4)
-        if 0.7 <= dataP1 <= 0.8:
+        if 0.5 <= dataP1 <= 0.8:
             self.speed1_label.setPixmap(self.speed1_pixmap_5)
         if 0.8 <= dataP1 <= 1:
             self.speed1_label.setPixmap(self.speed1_pixmap_6)
 
-        if 0.0 <= dataP2 < 0.1:
+        if 0.0 <= dataP2 < 0.05:
             self.speed2_label.setPixmap(self.speed2_pixmap)
-        if 0.1 <= dataP2 < 0.2:
+        if 0.05 <= dataP2 < 0.1:
             self.speed2_label.setPixmap(self.speed2_pixmap_1)
-        if 0.2 <= dataP2 < 0.3:
+        if 0.1 <= dataP2 < 0.2:
             self.speed2_label.setPixmap(self.speed2_pixmap_2)
-        if 0.3 <= dataP2 < 0.45:
+        if 0.2 <= dataP2 < 0.3:
             self.speed2_label.setPixmap(self.speed2_pixmap_3)
-        if 0.45 <= dataP2 < 0.7:
+        if 0.3 <= dataP2 < 0.5:
             self.speed2_label.setPixmap(self.speed2_pixmap_4)
-        if 0.7 <= dataP2 <= 0.8:
+        if 0.5 <= dataP2 <= 0.8:
             self.speed2_label.setPixmap(self.speed2_pixmap_5)
         if 0.8 <= dataP2 <= 1:
             self.speed2_label.setPixmap(self.speed2_pixmap_6)
         print 'TOUT EST BEAU!'
 
         if self.serial_channel is not None: 
-            if dataP1 < 0.17:
-                dataP1 = 0.17
-            if dataP2 < 0.17:
-                dataP2 = 0.17
-			
-			# Plus on augmente la valeur d'attenuation, plus la valeur de data sera attenuee.
-            ValeurDattenuation = 0.5
+            
 
-            # Attenuation est de x*e^(-0.3x) pour un facteur d'attenuation de 0.3
-            DATA1 = dataP1 * exp(-ValeurDattenuation * dataP1)
-            DATA2 = dataP2 * exp(-ValeurDattenuation * dataP2)
+            if dataP1 < self.borneMin:
+                dataP1 = self.borneMin
+            if dataP2 < self.borneMin:
+                dataP2 = self.borneMin
+
+            if dataP1 > self.borneMax:
+                dataP1 = self.borneMax
+            if dataP2 > self.borneMax:
+                dataP2 = self.borneMax
+
+            DATA1 = (dataP1 - self.borneMin)/(self.borneMax - self.borneMin)
+            DATA2 = (dataP2 - self.borneMin)/(self.borneMax - self.borneMin)
             valueP1 = int(100 + DATA1 * 255)
             valueP2 = int(100 + DATA2 * 255)
+
             try: #Here we only wanna send data no read...
                 while self.serial_channel.in_waiting:
                     print 'Received', self.serial_channel.readline()
+                # ------------------Decommenter ici pour competitionner avec l ordinateur.--------------
+                #valueP2 = 165
                 print 'Sending', valueP1, valueP2
-                #self.serial_channel.write(str(valueP1)+str(valueP2))  # between 100 and 355, this line will wait until message is effectively written on channel.
+                self.serial_channel.write(str(valueP1)+str(valueP2))  # between 100 and 355, this line will wait until message is effectively written on channel.
+               
+                print('valueP1: ', valueP1, 'valueP2: ', valueP2)
                 time.sleep(1)
             except Exception as e:
                 print 'Error when sending data to boat P1:', str(e)
