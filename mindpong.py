@@ -40,7 +40,7 @@ def update_data(update_frequency=20.0, gui=None, signal_P1=None, signal_P2=None)
                 time.sleep(0.25 / update_frequency)
 
 
-def run_server(gui=None, port=5001, player_signal=None):
+def run_server(port=5001, player_signal=None):
     signals = dict()
 
     # EEG signal
@@ -80,8 +80,8 @@ def main():
                                                  estimated_acquisition_freq=10.0,
                                                  label_channels=['0', '1', '2', '3'])
 
-    run_server(gui=gui, port=5001, player_signal=signal_concentration_P1)
-    run_server(gui=gui, port=5002, player_signal=signal_concentration_P2)
+    run_server(port=5001, player_signal=signal_concentration_P1)
+    run_server(port=5002, player_signal=signal_concentration_P2)
 
 
     update_frequency = 0.5
