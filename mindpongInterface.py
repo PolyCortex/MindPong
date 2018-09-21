@@ -23,16 +23,7 @@ class MindpongInterface(QtGui.QMainWindow):
         #[w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
         [w, h] = [1300, 700]
         [w_btn, h_btn] = [100, 30]
-        [w_label, h_label] = [100, 30]
         # Create labels
-        self.status1_label = QtGui.QLabel(self)
-        self.status1_label.setText("0 0 0 0 0 - 100%")
-        self.status1_label.resize(w_label, h_label)
-        self.status1_label.move(10, 0)
-        self.status2_label = QtGui.QLabel(self)
-        self.status2_label.setText("0 0 0 0 0 - 100%")
-        self.status2_label.resize(w_label, h_label)
-        self.status2_label.move(w-w_label, 0)
         self.speed1_label = QtGui.QLabel(self)
         self.speed1_pixmap = QtGui.QPixmap("./images/j1_0.gif")
         self.speed1_pixmap_1 = QtGui.QPixmap("./images/j1_1.gif")
