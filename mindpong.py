@@ -47,7 +47,7 @@ def run_server(port=5001, player_signal=None):
     if player_signal is None:
         signal_concentration = MultiChannelSignal(length=300,
                                                   estimated_acquisition_freq=10.0,
-                                                  label_channels=['0', '1', '2', '3'])
+                                                  number_of_channels=4)
     else:
         signal_concentration = player_signal
 
@@ -74,11 +74,11 @@ def main():
 
     signal_concentration_P1 = MultiChannelSignal(length=300,
                                                  estimated_acquisition_freq=10.0,
-                                                 label_channels=['0', '1', '2', '3'])
+                                                 number_of_channels=4)
 
     signal_concentration_P2 = MultiChannelSignal(length=300,
                                                  estimated_acquisition_freq=10.0,
-                                                 label_channels=['0', '1', '2', '3'])
+                                                 number_of_channels=4)
 
     run_server(port=5001, player_signal=signal_concentration_P1)
     run_server(port=5002, player_signal=signal_concentration_P2)
