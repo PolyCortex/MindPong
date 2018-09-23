@@ -17,7 +17,7 @@ class MindpongInterface(QtGui.QMainWindow):
         self.borneMax = 0.4
 
     def create_gauge(self, index, position):
-        pixmaps = [QtGui.QPixmap("./images/j" + str(index) + "_" + str(x) + ".gif") for x in range(7)]
+        pixmaps = [QtGui.QPixmap("./images/j" + str(index + 1) + "_" + str(x) + ".gif") for x in range(7)]
         gauge = { 'label': QtGui.QLabel(self), 'pixmaps': pixmaps }
         gauge['label'].setPixmap(pixmaps[0])
         gauge['label'].resize(pixmaps[0].width(), pixmaps[0].height())
@@ -33,9 +33,8 @@ class MindpongInterface(QtGui.QMainWindow):
         [w_btn, h_btn] = [100, 30]
         # Create labels
         self.gauges = [
-            self.create_gauge(x, position) 
-            for x in range(2) 
-            for position in [(w/4-600/2, h/2-600/2), (3*w/4-600/2, h/2-600/2)]
+            self.create_gauge(index, position) 
+            for index, position in enumerate([(w/4-300, h/2-300), (3*w/4-300, h/2-300)])
         ] 
 
         # Create buttons
