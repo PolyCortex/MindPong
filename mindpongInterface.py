@@ -16,6 +16,14 @@ class MindpongInterface(QtGui.QMainWindow):
         self.borneMin = 0.05
         self.borneMax = 0.4
 
+    def create_gauge(self, index, position):
+        pixmaps = [QtGui.QPixmap("./images/j" + str(index) + "_" + str(x) + ".gif") for x in range(7)]
+        gauge = { 'label': QtGui.QLabel(self), 'pixmaps': pixmaps }
+        gauge['label'].setPixmap(pixmaps[0])
+        gauge['label'].resize(pixmaps[0].width(), pixmaps[0].height())
+        gauge['label'].move(position[0], position[1])
+        return gauge
+
     def home(self):
         # Define dimensions - Only works on windows ...
         #user32 = ctypes.windll.user32
@@ -24,28 +32,12 @@ class MindpongInterface(QtGui.QMainWindow):
         [w, h] = [1300, 700]
         [w_btn, h_btn] = [100, 30]
         # Create labels
-        self.speed1_label = QtGui.QLabel(self)
-        self.speed1_pixmap = QtGui.QPixmap("./images/j1_0.gif")
-        self.speed1_pixmap_1 = QtGui.QPixmap("./images/j1_1.gif")
-        self.speed1_pixmap_2 = QtGui.QPixmap("./images/j1_2.gif")
-        self.speed1_pixmap_3 = QtGui.QPixmap("./images/j1_3.gif")
-        self.speed1_pixmap_4 = QtGui.QPixmap("./images/j1_4.gif")
-        self.speed1_pixmap_5 = QtGui.QPixmap("./images/j1_5.gif")
-        self.speed1_pixmap_6 = QtGui.QPixmap("./images/j1_6.gif")
-        self.speed1_label.setPixmap(self.speed1_pixmap)
-        self.speed1_label.resize(self.speed1_pixmap.width(), self.speed1_pixmap.height())
-        self.speed1_label.move(w/4-600/2, h/2-600/2)
-        self.speed2_label = QtGui.QLabel(self)
-        self.speed2_pixmap = QtGui.QPixmap("./images/j2_0.gif")
-        self.speed2_pixmap_1 = QtGui.QPixmap("./images/j2_1.gif")
-        self.speed2_pixmap_2 = QtGui.QPixmap("./images/j2_2.gif")
-        self.speed2_pixmap_3 = QtGui.QPixmap("./images/j2_3.gif")
-        self.speed2_pixmap_4 = QtGui.QPixmap("./images/j2_4.gif")
-        self.speed2_pixmap_5 = QtGui.QPixmap("./images/j2_5.gif")
-        self.speed2_pixmap_6 = QtGui.QPixmap("./images/j2_6.gif")
-        self.speed2_label.setPixmap(self.speed2_pixmap)
-        self.speed2_label.resize(self.speed2_pixmap.width(), self.speed2_pixmap.height())
-        self.speed2_label.move(3*w/4-600/2, h/2-600/2)
+        self.gauges = [
+            self.create_gauge(x, position) 
+            for x in range(2) 
+            for position in [(w/4-600/2, h/2-600/2), (3*w/4-600/2, h/2-600/2)]
+        ] 
+
         # Create buttons
         self.exit_btn = QtGui.QPushButton("Quitter", self)
         self.exit_btn.resize(w_btn, h_btn)
@@ -211,41 +203,30 @@ class MindpongInterface(QtGui.QMainWindow):
         self.unconnect2_btn.setDisabled(True)
         self.connect2_btn.setStyleSheet("background-color: gray")
 
+    def update_gauges(self, data, index):
+        if 0.0 <= data < 0.05:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][0])
+        if 0.05 <= data < 0.1:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][1])
+        if 0.1 <= data < 0.2:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][2])
+        if 0.2 <= data < 0.3:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][3])
+        if 0.3 <= data < 0.5:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][4])
+        if 0.5 <= data <= 0.8:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][5])
+        if 0.8 <= data <= 1:
+            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][6])
+
     @QtCore.pyqtSlot(float, float)
     def update_data_Ard(self, dataP1, dataP2):
         if not self.is_playing:
             print 'APPUYER SUR PLAY'
             return
-
-        if 0.0 <= dataP1 < 0.05:
-            self.speed1_label.setPixmap(self.speed1_pixmap)
-        if 0.05 <= dataP1 < 0.1:
-            self.speed1_label.setPixmap(self.speed1_pixmap_1)
-        if 0.1 <= dataP1 < 0.2:
-            self.speed1_label.setPixmap(self.speed1_pixmap_2)
-        if 0.2 <= dataP1 < 0.3:
-            self.speed1_label.setPixmap(self.speed1_pixmap_3)
-        if 0.3 <= dataP1 < 0.5:
-            self.speed1_label.setPixmap(self.speed1_pixmap_4)
-        if 0.5 <= dataP1 <= 0.8:
-            self.speed1_label.setPixmap(self.speed1_pixmap_5)
-        if 0.8 <= dataP1 <= 1:
-            self.speed1_label.setPixmap(self.speed1_pixmap_6)
-
-        if 0.0 <= dataP2 < 0.05:
-            self.speed2_label.setPixmap(self.speed2_pixmap)
-        if 0.05 <= dataP2 < 0.1:
-            self.speed2_label.setPixmap(self.speed2_pixmap_1)
-        if 0.1 <= dataP2 < 0.2:
-            self.speed2_label.setPixmap(self.speed2_pixmap_2)
-        if 0.2 <= dataP2 < 0.3:
-            self.speed2_label.setPixmap(self.speed2_pixmap_3)
-        if 0.3 <= dataP2 < 0.5:
-            self.speed2_label.setPixmap(self.speed2_pixmap_4)
-        if 0.5 <= dataP2 <= 0.8:
-            self.speed2_label.setPixmap(self.speed2_pixmap_5)
-        if 0.8 <= dataP2 <= 1:
-            self.speed2_label.setPixmap(self.speed2_pixmap_6)
+            
+        self.update_gauges(dataP1, 0)
+        self.update_gauges(dataP2, 1)
 
         if self.serial_channel is not None: 
             if dataP1 < self.borneMin:
