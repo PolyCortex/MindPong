@@ -4,8 +4,6 @@ import time
 import serial
 import pexpect
 
-MUSES = {'Muse 1': 'Muse-0CCD', 'Muse 2': 'Muse-201E', 'Muse 3': 'Muse-4E4E', 'Muse 4': 'Muse-7F68'}
-
 class MindpongInterface(QtGui.QMainWindow):
     change_images = QtCore.pyqtSignal(float, float)
 
@@ -42,36 +40,6 @@ class MindpongInterface(QtGui.QMainWindow):
         self.exit_btn.resize(w_btn, h_btn)
         self.exit_btn.move(w/2-w_btn/2, h-2*h_btn)
 
-        self.Combo1 = QtGui.QComboBox(self)
-        self.Combo1.setObjectName("Muse Gauche")
-        for muse_name in MUSES:
-            self.Combo1.addItem(muse_name)
-        self.Combo1.resize(w_btn, h_btn)
-        self.Combo1.move(w / 4 - 1 * w_btn / 2, h - 1 * h_btn)
-
-        self.connect1_btn = QtGui.QPushButton("Connecter J1", self)
-        self.connect1_btn.resize(w_btn, h_btn)
-        self.connect1_btn.move(w/4-3*w_btn/2, h-2*h_btn)
-        self.unconnect1_btn = QtGui.QPushButton("Deconnecter J1", self)
-        self.unconnect1_btn.resize(w_btn, h_btn)
-        self.unconnect1_btn.move(w/4+w_btn/2, h-2*h_btn)
-        self.unconnect1_btn.setDisabled(True)
-
-        self.Combo2 = QtGui.QComboBox(self)
-        self.Combo2.setObjectName("Muse Gauche")
-        for muse_name in MUSES:
-            self.Combo2.addItem(muse_name)
-        self.Combo2.resize(w_btn, h_btn)
-        self.Combo2.move(3*w / 4 - 1 * w_btn / 2, h - 1 * h_btn)
-
-        self.connect2_btn = QtGui.QPushButton("Connecter J2", self)
-        self.connect2_btn.resize(w_btn, h_btn)
-        self.connect2_btn.move(3*w/4-3*w_btn/2, h-2*h_btn)
-        self.unconnect2_btn = QtGui.QPushButton("Deconnecter J2", self)
-        self.unconnect2_btn.resize(w_btn, h_btn)
-        self.unconnect2_btn.move(3*w/4+w_btn/2, h-2*h_btn)
-        self.unconnect2_btn.setDisabled(True)
-
         self.play_btn = QtGui.QPushButton("Jouer", self)
         self.play_btn.resize(w_btn, h_btn)
         self.play_btn.move(w/2-w_btn/2, h/2)
@@ -86,55 +54,28 @@ class MindpongInterface(QtGui.QMainWindow):
         self.exit_btn.clicked.connect(self.cb_close_app)
         self.play_btn.clicked.connect(self.cb_play)
         self.stop_btn.clicked.connect(self.cb_stop)
-        self.connect1_btn.clicked.connect(self.cb_connect1)
-        self.unconnect1_btn.clicked.connect(self.cb_unconnect1)
-        self.connect2_btn.clicked.connect(self.cb_connect2)
-        self.unconnect2_btn.clicked.connect(self.cb_unconnect2)
         self.change_images.connect(self.update_data_Ard)
 
         # variables
-        self.connexion_muse_P1 = None
-        self.connexion_muse_P2 = None
         self.serial_channel = None
-        self.port = 'COM1'  # arduino port, this line must be changed depending on the computer
+        self.port = 'COM6'  # arduino port, this line must be changed depending on the computer
         self.baud = 9600
 
-        # Display window
         self.showFullScreen()
 
     def cb_close_app(self):
-        # Make sure the Muse are disconnected
-        # Close the GUI
-        if self.connexion_muse_P1 is not None:
-            self.connexion_muse_P1.sendcontrol('c')
-            self.connexion_muse_P1 = None
-        if self.connexion_muse_P2 is not None:
-            self.connexion_muse_P2.sendcontrol('c')
-            self.connexion_muse_P2 = None
         if self.serial_channel is not None:
             self.serial_channel.close()
         sys.exit()
 
     def cb_play(self):
-        # Callback for when the game starts
-        # Needs to update self.speedX_label when speed is changed. This is done by loading "jX_Y.gif" and displaying it,
-        # with Y representing the speed level.
-        # Needs to constantly update the connection status, which is, for each player, the text shown in the top corners
-        # of the screen as "0 0 0 0 0 - 100%" initially. The 5 zeros represent the contact of the 5 electrodes, and
-        # the 100% represents the battery life.
-        # Needs to run for a set amount of time OR until a player has activated the contact detector at the finish line
-        # At the end of execution, needs to put back the GUI in its initial state whilst keeping the Muse connected
-        # Also, should verify if both Muse are connected or just one, since the game should be playable alone if needed
-        # init port
         try:
             self.serial_channel = serial.Serial()
             self.serial_channel.port = self.port
             self.serial_channel.baudrate = self.baud
             self.serial_channel.readable()
             self.serial_channel.timeout = 1
-            # open port
             self.serial_channel.open()
-            # print(ser.is_open)
         except Exception as e:
             print e
             print 'could not connect to port ' + self.port
@@ -154,53 +95,6 @@ class MindpongInterface(QtGui.QMainWindow):
         self.play_btn.setStyleSheet("background-color: grey")
         self.stop_btn.setDisabled(True)
         self.play_btn.setEnabled(True)
-
-    def cb_connect1(self):
-        # Needs to connect Muse to the program here
-        # Verify that the connection is good
-        # If the connection has failed, show an error message
-        # If the connection is successful, disable the connect button and activate the unconnect one
-        connect_status = ['================== Muse Status ==================', 'Connection failure 5', pexpect.EOF, pexpect.TIMEOUT]
-
-        muse_P1 = MUSES[str(self.Combo1.currentText())]
-        cmd = 'muse-io --osc osc.udp://localhost:5001 --device ' + muse_P1
-        #cmd = ['muse-io', '--osc', 'osc.udp://localhost:5001', '--device', muse_P1]
-        print cmd
-
-    def cb_unconnect1(self):
-        # Needs to disconnect the Muse and verify that the ports have been closed
-        # If the disconnection is successful, disable the unconnect button and activate the connect one
-        self.connexion_muse_P1.sendcontrol('c')
-        self.connexion_muse_P1 = None
-        print 'Killed process Muse P1'
-
-        self.Combo1.setEnabled(True)
-        self.connect1_btn.setEnabled(True)
-        self.unconnect1_btn.setDisabled(True)
-        self.connect1_btn.setStyleSheet("background-color: gray")
-
-    def cb_connect2(self):
-        # Needs to connect Muse to the program here
-        # Verify that the connection is good
-        # If the connection has failed, show an error message
-        # If the connection is successful, disable the connect button and activate the unconnect one
-        connect_status = ['================== Muse Status ==================', 'Connection failure 5', pexpect.EOF, pexpect.TIMEOUT]
-
-        muse_P2 = MUSES[str(self.Combo2.currentText())]
-        cmd = 'muse-io --osc osc.udp://localhost:5002 --device ' + muse_P2
-        print cmd
-
-    def cb_unconnect2(self):
-        # Needs to disconnect the Muse and verify that the ports have been closed
-        # If the disconnection is successful, disable the unconnect button and activate the connect one
-        self.connexion_muse_P2.sendcontrol('c')
-        self.connexion_muse_P2 = None
-        print 'Killed process Muse P2'
-
-        self.Combo2.setEnabled(True)
-        self.connect2_btn.setEnabled(True)
-        self.unconnect2_btn.setDisabled(True)
-        self.connect2_btn.setStyleSheet("background-color: gray")
 
     def update_gauges(self, data, index):
         if 0.0 <= data < 0.05:
