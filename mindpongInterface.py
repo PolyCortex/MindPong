@@ -3,16 +3,17 @@ from PyQt4 import QtGui, QtCore
 import time
 import serial
 import pexpect
+import math
 
 class MindpongInterface(QtGui.QMainWindow):
-    change_images = QtCore.pyqtSignal(float, float)
+    change_images = QtCore.pyqtSignal(list)
 
     def __init__(self):
         super(MindpongInterface, self).__init__()
         self.setWindowTitle("MindPong")
         self.home()
-        self.borneMin = 0.05
-        self.borneMax = 0.4
+        self.lowerBound = 0.05
+        self.upperBound = 0.4
 
     def create_gauge(self, index, position):
         pixmaps = [QtGui.QPixmap("./images/j" + str(index + 1) + "_" + str(x) + ".png") for x in range(7)]
@@ -54,7 +55,8 @@ class MindpongInterface(QtGui.QMainWindow):
         self.exit_btn.clicked.connect(self.cb_close_app)
         self.play_btn.clicked.connect(self.cb_play)
         self.stop_btn.clicked.connect(self.cb_stop)
-        self.change_images.connect(self.update_data_Ard)
+        self.change_images.connect(self.send_data_arduino)
+        self.change_images.connect(self.update_gauges)
 
         # variables
         self.serial_channel = None
@@ -96,59 +98,36 @@ class MindpongInterface(QtGui.QMainWindow):
         self.stop_btn.setDisabled(True)
         self.play_btn.setEnabled(True)
 
-    def update_gauges(self, data, index):
-        if 0.0 <= data < 0.05:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][0])
-        if 0.05 <= data < 0.1:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][1])
-        if 0.1 <= data < 0.2:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][2])
-        if 0.2 <= data < 0.3:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][3])
-        if 0.3 <= data < 0.5:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][4])
-        if 0.5 <= data <= 0.8:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][5])
-        if 0.8 <= data <= 1:
-            self.gauges[index]['label'].setPixmap(self.gauges[index]['pixmaps'][6])
-
-    @QtCore.pyqtSlot(float, float)
-    def update_data_Ard(self, dataP1, dataP2):
+    @QtCore.pyqtSlot(list)
+    def update_gauges(self, relative_beta_list):
         if not self.is_playing:
-            print 'APPUYER SUR PLAY'
             return
-            
-        self.update_gauges(dataP1, 0)
-        self.update_gauges(dataP2, 1)
 
-        if self.serial_channel is not None: 
-            if dataP1 < self.borneMin:
-                dataP1 = self.borneMin
-            if dataP2 < self.borneMin:
-                dataP2 = self.borneMin
+        for index, relative_beta in enumerate(relative_beta_list):
+            pixmap_index = int(relative_beta * 7)
+            self.gauges[index]['label'].setPixmap(
+                self.gauges[index]['pixmaps'][pixmap_index]
+            )
 
-            if dataP1 > self.borneMax:
-                dataP1 = self.borneMax
-            if dataP2 > self.borneMax:
-                dataP2 = self.borneMax
 
-            DATA1 = (dataP1 - self.borneMin)/(self.borneMax - self.borneMin)
-            DATA2 = (dataP2 - self.borneMin)/(self.borneMax - self.borneMin)
-            valueP1 = int(100 + DATA1 * 255)
-            valueP2 = int(100 + DATA2 * 255)
+    @QtCore.pyqtSlot(list)
+    def send_data_arduino(self, relative_beta_list):
+        if not self.is_playing or self.serial_channel is None:
+            return
 
-            try: #Here we only wanna send data no read...
-                while self.serial_channel.in_waiting:
-                    print 'Received', self.serial_channel.readline()
-                # ------------------Decommenter ici pour competitionner avec l ordinateur.--------------
-                #valueP2 = 165
-                print 'Sending', valueP1, valueP2
-                self.serial_channel.write(str(valueP1)+str(valueP2))  # between 100 and 355, this line will wait until message is effectively written on channel.
-               
-                print('valueP1: ', valueP1, 'valueP2: ', valueP2)
-                time.sleep(1)
-            except Exception as e:
-                print 'Error when sending data to boat P1:', str(e)
-                self.is_playing = False
+        sent_value = ""
+        for relative_beta in relative_beta_list:
+            relative_beta = self.lowerBound if relative_beta < self.lowerBound else relative_beta
+            relative_beta = self.upperBound if relative_beta > self.upperBound else relative_beta
+            sent_value += str(100 + int((relative_beta - self.lowerBound)/(self.upperBound - self.lowerBound) * 255))
 
-        return
+        try:
+            while self.serial_channel.in_waiting:
+                print 'Received', self.serial_channel.readline()
+            print 'Sending', sent_value
+            self.serial_channel.write(sent_value)  # between 100 and 355, this line will wait until message is effectively written on channel.
+            time.sleep(1)
+        except Exception as e:
+            print 'Error when sending data to microcontroller:', str(e)
+            self.is_playing = False
+

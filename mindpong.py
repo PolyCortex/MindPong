@@ -34,7 +34,7 @@ def update_data(update_frequency=20.0, gui=None, signal_P1=None, signal_P2=None)
                     signal_P2.lock.release()
 
                 print 'I am updating my data', dP1, dP2, analysis_frequency
-                gui.change_images.emit(dP1, dP2)
+                gui.change_images.emit([dP1, dP2])
 
             else:
                 time.sleep(0.25 / update_frequency)
