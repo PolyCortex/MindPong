@@ -1,9 +1,10 @@
 import sys
 from PyQt4 import QtGui, QtCore
 import time
-import serial
 import pexpect
 import math
+
+from services.serial_communication_service import SerialCommunicationService
 
 class MindpongInterface(QtGui.QMainWindow):
     LOWER_BOUND = 0.05
@@ -14,6 +15,7 @@ class MindpongInterface(QtGui.QMainWindow):
         super(MindpongInterface, self).__init__()
         self.setWindowTitle("MindPong")
         self.home()
+        self.serial_communication_service = SerialCommunicationService()
 
     def create_gauge(self, index, position):
         pixmaps = [QtGui.QPixmap("./images/j" + str(index + 1) + "_" + str(x) + ".png") for x in range(7)]
@@ -58,29 +60,16 @@ class MindpongInterface(QtGui.QMainWindow):
         self.change_images.connect(self.send_data_arduino)
         self.change_images.connect(self.update_gauges)
 
-        # variables
-        self.serial_channel = None
-        self.port = 'COM6'  # arduino port, this line must be changed depending on the computer
-        self.baud = 9600
-
         self.showFullScreen()
 
     def cb_close_app(self):
-        if self.serial_channel is not None:
-            self.serial_channel.close()
+        self.serial_communication_service.close_communication()
         sys.exit()
 
     def cb_play(self):
         try:
-            self.serial_channel = serial.Serial()
-            self.serial_channel.port = self.port
-            self.serial_channel.baudrate = self.baud
-            self.serial_channel.readable()
-            self.serial_channel.timeout = 1
-            self.serial_channel.open()
+            self.serial_communication_service.establish_communication()
         except Exception as e:
-            print e
-            print 'could not connect to port ' + self.port
             self.is_playing = False
             self.play_btn.setStyleSheet("background-color: red")
             return
@@ -91,9 +80,8 @@ class MindpongInterface(QtGui.QMainWindow):
         self.stop_btn.setEnabled(True)
 
     def cb_stop(self):
+        self.serial_communication_service.close_communication()
         self.is_playing = False
-        if self.serial_channel is not None:
-            self.serial_channel.close()
         self.play_btn.setStyleSheet("background-color: grey")
         self.stop_btn.setDisabled(True)
         self.play_btn.setEnabled(True)
@@ -112,7 +100,7 @@ class MindpongInterface(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot(list)
     def send_data_arduino(self, relative_beta_list):
-        if not self.is_playing or self.serial_channel is None:
+        if not self.is_playing or self.serial_communication_service.serial_channel is None:
             return
 
         sent_value = ""
@@ -122,10 +110,9 @@ class MindpongInterface(QtGui.QMainWindow):
             sent_value += str(100 + int((relative_beta - self.LOWER_BOUND)/(self.UPPER_BOUND - self.LOWER_BOUND) * 255))
 
         try:
-            while self.serial_channel.in_waiting:
-                print 'Received', self.serial_channel.readline()
+            print 'Reading', self.serial_communication_service.read_data()
             print 'Sending', sent_value
-            self.serial_channel.write(sent_value)  # between 100 and 355, this line will wait until message is effectively written on channel.
+            self.serial_communication_service.send_data(sent_value)
             time.sleep(1)
         except Exception as e:
             print 'Error when sending data to microcontroller:', str(e)
