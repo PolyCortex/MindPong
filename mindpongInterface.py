@@ -6,14 +6,14 @@ import pexpect
 import math
 
 class MindpongInterface(QtGui.QMainWindow):
+    LOWER_BOUND = 0.05
+    UPPER_BOUND = 0.4
     change_images = QtCore.pyqtSignal(list)
 
     def __init__(self):
         super(MindpongInterface, self).__init__()
         self.setWindowTitle("MindPong")
         self.home()
-        self.lowerBound = 0.05
-        self.upperBound = 0.4
 
     def create_gauge(self, index, position):
         pixmaps = [QtGui.QPixmap("./images/j" + str(index + 1) + "_" + str(x) + ".png") for x in range(7)]
@@ -117,9 +117,9 @@ class MindpongInterface(QtGui.QMainWindow):
 
         sent_value = ""
         for relative_beta in relative_beta_list:
-            relative_beta = self.lowerBound if relative_beta < self.lowerBound else relative_beta
-            relative_beta = self.upperBound if relative_beta > self.upperBound else relative_beta
-            sent_value += str(100 + int((relative_beta - self.lowerBound)/(self.upperBound - self.lowerBound) * 255))
+            relative_beta = self.LOWER_BOUND if relative_beta < self.LOWER_BOUND else relative_beta
+            relative_beta = self.UPPER_BOUND if relative_beta > self.UPPER_BOUND else relative_beta
+            sent_value += str(100 + int((relative_beta - self.LOWER_BOUND)/(self.UPPER_BOUND - self.LOWER_BOUND) * 255))
 
         try:
             while self.serial_channel.in_waiting:
