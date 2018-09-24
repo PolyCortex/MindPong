@@ -9,7 +9,7 @@ from pymuse.ios import MuseIO, MuseIOError
 from pymuse.signals import MultiChannelSignal
 from pymuse.processes import Process
 from pymuse.pipeline import Analyzer
-from mindpongInterface import MindpongInterface
+from mindpong_interface import MindpongInterface
 
 def update_data(update_frequency=20.0, gui=None, signal_P1=None, signal_P2=None):
     if gui is not None:
