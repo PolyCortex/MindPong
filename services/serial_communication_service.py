@@ -1,11 +1,12 @@
 import serial
 
-class SerialCommunicationService:
+class SerialCommunicationService(object):
     BAUD = 9600
     PORT = 'COM6'
 
     def __init__(self):
         self.serial_channel = None
+        self.is_connected = False
 
     def establish_communication(self):
         try: 
@@ -19,10 +20,12 @@ class SerialCommunicationService:
             print 'SerialCommunicationService: Could not connect to port ' + self.PORT
             print e
             raise(e)
+        self.is_connected = True
 
     def close_communication(self):
         if self.serial_channel is not None:
             self.serial_channel.close()
+            self.is_connected = False
 
     def read_data(self):
         while self.serial_channel.in_waiting:
@@ -31,3 +34,4 @@ class SerialCommunicationService:
     def send_data(self, data):
         self.serial_channel.write(data)
 
+serial_communication_service = SerialCommunicationService()
