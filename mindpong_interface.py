@@ -6,6 +6,7 @@ import math
 from services.arduino_communication_service import arduino_communication_service
 
 class MindpongInterface(QtGui.QMainWindow):
+    [W_BTN, H_BTN] = [100, 30]
     change_images = QtCore.pyqtSignal(list)
 
     def __init__(self):
@@ -21,13 +22,19 @@ class MindpongInterface(QtGui.QMainWindow):
         gauge['label'].move(position[0], position[1])
         return gauge
 
+    def create_button(self, label, position_x, position_y):
+        btn = QtGui.QPushButton(label, self)
+        btn.resize(self.W_BTN, self.H_BTN)
+        btn.move(position_x, position_y)
+        return btn
+
     def home(self):
         # Define dimensions - Only works on windows ...
         #user32 = ctypes.windll.user32
         #user32.SetProcessDPIAware()
         #[w, h] = [user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)]
         [w, h] = [1300, 700]
-        [w_btn, h_btn] = [100, 30]
+        [w_btn, h_btn] = [self.W_BTN, self.H_BTN]
         # Create labels
         self.gauges = [
             self.create_gauge(index, position) 
@@ -35,17 +42,9 @@ class MindpongInterface(QtGui.QMainWindow):
         ] 
 
         # Create buttons
-        self.exit_btn = QtGui.QPushButton("Quitter", self)
-        self.exit_btn.resize(w_btn, h_btn)
-        self.exit_btn.move(w/2-w_btn/2, h-2*h_btn)
-
-        self.play_btn = QtGui.QPushButton("Jouer", self)
-        self.play_btn.resize(w_btn, h_btn)
-        self.play_btn.move(w/2-w_btn/2, h/2)
-
-        self.stop_btn = QtGui.QPushButton("Stop", self)
-        self.stop_btn.resize(w_btn, h_btn)
-        self.stop_btn.move(w / 2 - w_btn / 2, h / 2 + 2 * h_btn)
+        self.exit_btn = self.create_button("Quitter", w/2-w_btn/2, h-2*h_btn)
+        self.play_btn = self.create_button("Jouer",   w/2-w_btn/2, h/2)
+        self.stop_btn = self.create_button("Stop",    w/2-w_btn/2, h/2+2*h_btn)
         self.stop_btn.setDisabled(True)
 
         # Associate callbacks
