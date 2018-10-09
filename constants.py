@@ -1,7 +1,7 @@
 BACKGROUND_COLORS = {
     "RED": "background-color: red",
-    "GREEN": "background-color: red",
-    "GREY": "background-color: red"
+    "GREEN": "background-color: green",
+    "GREY": "background-color: grey"
 }
 
 WINDOW_SIZE = {
