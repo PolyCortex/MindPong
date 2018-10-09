@@ -2,13 +2,11 @@ import sys
 from PyQt4 import QtGui
 import time
 import thread
-from math import exp
 import numpy as np
 
 from pymuse.ios import MuseIO, MuseIOError
 from pymuse.signals import MultiChannelSignal
 from pymuse.processes import Process
-from pymuse.pipeline import Analyzer
 from mindpong_interface import MindpongInterface
 
 def update_data(update_frequency=20.0, gui=None, signal_P1=None, signal_P2=None):
@@ -55,7 +53,7 @@ def run_server(port=5001, player_signal=None):
 
     # Initializing the server
     try:
-        server = MuseIO(port=port, signal=signals)
+        server = MuseIO(port, signals)
     except MuseIOError, err:
         print str(err)
         sys.exit(1)
