@@ -32,7 +32,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'boatGUI=boatGUI:main',
+            'mindpong=mindpong:main',
         ],
     },
 )
