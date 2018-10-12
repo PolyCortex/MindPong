@@ -1,4 +1,5 @@
 from serial import Serial, SerialTimeoutException
+import numpy as np
 
 BAUD_RATE = 9600
 PORT = 'COM5'
@@ -8,6 +9,8 @@ class SerialCommunicationService(object):
     is_connected = False
     _serial_channel = None
 
+    def is_data_valid(self, data):
+        return self.is_connected and self._serial_channel is not None and not any(np.isnan(data))
 
     def establish_communication(self):
         try: 
@@ -28,7 +31,7 @@ class SerialCommunicationService(object):
 
 
     def is_data_available(self):
-        return self._serial_channel.in_waiting
+        return self._serial_channel is not None and self._serial_channel.in_waiting
 
 
     def read_data(self, nb_bytes=1):

@@ -80,7 +80,7 @@ class MindpongInterface(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot(list)
     def update_gauges(self, relative_beta_list):
-        if not arduino_communication_service.is_connected:
+        if not arduino_communication_service.is_data_valid(relative_beta_list):
             return
 
         for index, relative_beta in enumerate(relative_beta_list):

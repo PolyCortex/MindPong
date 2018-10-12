@@ -10,15 +10,13 @@ UPPER_BOUND = 0.4
 class ArduinoCommunicationService(SerialCommunicationService):
 
     def send_data(self, data):
-        if not self.is_connected:
-            return
-
         if super(ArduinoCommunicationService, self).is_data_available():
             print 'Reading', super(ArduinoCommunicationService, self).read_data(2)
 
-        value_to_send = self._get_clipped_signals(data)
-        print 'Sending', value_to_send
-        super(ArduinoCommunicationService, self).send_data(bytearray(value_to_send))
+        if super(ArduinoCommunicationService, self).is_data_valid(data):
+            value_to_send = self._get_clipped_signals(data)
+            print 'Sending', value_to_send
+            super(ArduinoCommunicationService, self).send_data(bytearray(value_to_send))
     
 
     def _get_clipped_signals(self, signals):
