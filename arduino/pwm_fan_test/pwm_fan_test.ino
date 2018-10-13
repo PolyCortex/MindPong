@@ -1,3 +1,9 @@
+/*
+  pwm_fan_test.ino - Tests the circuit connecting 
+  the fan motor to the arduino pin.
+  Circuit schema: TODO
+*/
+
 #define DC_MOTOR_PIN1 6
 #define DC_MOTOR_PIN2 10
 #define ONOFF 3
@@ -29,13 +35,13 @@ void loop()
   {
     if(mode==1)
     {
-    analogWrite( DC_MOTOR_PIN1, 100 );
-    analogWrite( DC_MOTOR_PIN2, 200 );
+      analogWrite( DC_MOTOR_PIN1, 100 );
+      analogWrite( DC_MOTOR_PIN2, 200 );
     }
     if(mode==0)
     {
-    analogWrite( DC_MOTOR_PIN1, 100 ); 
-    analogWrite( DC_MOTOR_PIN2, 200 );
-   }
+      analogWrite( DC_MOTOR_PIN1, 100 ); 
+      analogWrite( DC_MOTOR_PIN2, 200 );
+    }
   }
 }
