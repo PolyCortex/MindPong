@@ -40,6 +40,8 @@ void loop() {
   int win1 = digitalRead(Detector1);
   int win2 = digitalRead(Detector2);
 
+//  Lasers are currently broken
+
 //  if ( win1 == 0 ) {
 //    analogWrite(motorPin1, 0);
 //    analogWrite(motorPin2, 0);
@@ -62,15 +64,9 @@ void loop() {
 //
   if (Serial.available()) {
     String data = Serial.readString();
-    String dataP1 = data.substring(0, 3);
-    String dataP2 = data.substring(3, 6);
-    int museDataP1 = dataP1.toInt();
-    int museDataP2 = dataP2.toInt();
+    motorSpeed1 = data.substring(0, 3).toInt();
+    motorSpeed2 = data.substring(3, 6).toInt();
     Serial.println("RECEIVED : " + data);
-    if (museDataP1 >= 100 and museDataP2 >= 100) {
-      motorSpeed1 = museDataP1 - 50;
-      motorSpeed2 = museDataP2 - 50;
-    }
   }
   analogWrite(motorPin1, motorSpeed1);
   analogWrite(motorPin2, motorSpeed2);
