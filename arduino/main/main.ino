@@ -1,4 +1,8 @@
 #include <Servo.h>
+
+int PLAYER_1 = 1;
+int PLAYER_2 = 2;
+
 Servo s1;
 Servo s2;
 
@@ -25,43 +29,19 @@ void setup() {
   pinMode(Laser2, OUTPUT);
   pinMode(Detector2, INPUT);
 
-  analogWrite(motorPin1, 0);
-  analogWrite(motorPin2, 0);
-  Serial.begin(9600);
-  Serial.print("Hello Computer");
-}
-
-void loop() {
   digitalWrite(Laser1, HIGH);
   digitalWrite(Laser2, HIGH);
   s1.write(0);
   s2.write(180);
+  Serial.begin(9600);
+}
 
-  int win1 = digitalRead(Detector1);
-  int win2 = digitalRead(Detector2);
+void loop() {
+  //  Lasers are currently broken
+  checkEndGame(digitalRead(Detector1), PLAYER_1);
+  checkEndGame(digitalRead(Detector2), PLAYER_2);
 
-//  Lasers are currently broken
 
-//  if ( win1 == 0 ) {
-//    analogWrite(motorPin1, 0);
-//    analogWrite(motorPin2, 0);
-//    s2.write(90);
-//    delay(2000);
-//    s2.write(180);
-//    Serial.println("Player 1 won");
-//    while (1) {}
-//  }
-//
-//  if ( win2 == 0 ) {
-//    analogWrite(motorPin1, 0);
-//    analogWrite(motorPin2, 0);
-//    s1.write(90);
-//    delay(2000);
-//    s1.write(0);
-//    Serial.println("Player 2 won");
-//    while (1) {}
-//  }
-//
   if (Serial.available()) {
     String data = Serial.readString();
     motorSpeed1 = data.substring(0, 3).toInt();
@@ -71,4 +51,21 @@ void loop() {
   analogWrite(motorPin1, motorSpeed1);
   analogWrite(motorPin2, motorSpeed2);
   delay(100);
+}
+
+void checkEndGame(int winPlayer, int playerID) {
+  Servo servo = playerID == PLAYER_1 ? s1: s2;
+  int lastServoPosition = playerID == PLAYER_1 ? 180: 0;
+  if ( winPlayer == 0 ) {
+
+    analogWrite(motorPin1, 0);
+    analogWrite(motorPin2, 0);
+
+    servo.write(90);
+    delay(2000);
+    servo.write(lastServoPosition);
+
+    Serial.println("Player won : " + playerID);
+    while (1) {}
+  }
 }
