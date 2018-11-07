@@ -1,3 +1,4 @@
+import struct
 import numpy as np
 import time
 
@@ -6,7 +7,6 @@ from serial_communication_service import SerialCommunicationService
 class ArduinoCommunicationService(SerialCommunicationService):
     LOWER_BOUND = 0.05
     UPPER_BOUND = 0.4
-    MIN_FAN_SPEED = 30
     PADDING = 3
 
     def __init__(self):
@@ -17,11 +17,12 @@ class ArduinoCommunicationService(SerialCommunicationService):
             return
 
         value_to_send = self.get_clipped_signals(data)
+        value_byte = bytes(bytearray(value_to_send))
 
         try:
             print 'Reading', super(ArduinoCommunicationService, self).read_data()
             print 'Sending', value_to_send
-            super(ArduinoCommunicationService, self).send_data("".join(value_to_send))
+            super(ArduinoCommunicationService, self).send_data(value_byte)
             time.sleep(1)
         except Exception as e:
             print 'Error when sending data to microcontroller:', str(e)
@@ -30,11 +31,11 @@ class ArduinoCommunicationService(SerialCommunicationService):
     def get_clipped_signals(self, signals):
         clipped_list = np.clip(signals, self.LOWER_BOUND, self.UPPER_BOUND)
         return [
-            str(self.get_clipped_value(x)).zfill(self.PADDING)
+            self.get_clipped_value(x)
             for x in clipped_list
         ]
     
     def get_clipped_value(self, value):
-        return int(255 * (value - self.LOWER_BOUND)/(self.UPPER_BOUND - self.LOWER_BOUND)) + self.MIN_FAN_SPEED
+        return int(255 * (value - self.LOWER_BOUND)/(self.UPPER_BOUND - self.LOWER_BOUND))
 
 arduino_communication_service = ArduinoCommunicationService()

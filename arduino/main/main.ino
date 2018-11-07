@@ -38,18 +38,18 @@ void setup() {
 
 void loop() {
   //  Lasers are currently broken
-  checkEndGame(digitalRead(Detector1), PLAYER_1);
-  checkEndGame(digitalRead(Detector2), PLAYER_2);
-
+  // checkEndGame(digitalRead(Detector1), PLAYER_1);
+  // checkEndGame(digitalRead(Detector2), PLAYER_2);
 
   if (Serial.available()) {
-    String data = Serial.readString();
-    motorSpeed1 = data.substring(0, 3).toInt();
-    motorSpeed2 = data.substring(3, 6).toInt();
-    Serial.println("RECEIVED : " + data);
+    motorSpeed1 = Serial.read();
+    motorSpeed2 = Serial.read();
+    Serial.println("RECEIVED : " + motorSpeed1);
   }
+    
   analogWrite(motorPin1, motorSpeed1);
   analogWrite(motorPin2, motorSpeed2);
+
   delay(100);
 }
 
