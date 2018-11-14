@@ -1,86 +1,78 @@
 #include <Servo.h>
-
-enum Players {
-  PLAYER_ONE,
-  PLAYER_TWO
-};
+#define NB_PLAYERS 2
 
 int MIN_FAN_SPEED = 50;
-
 Servo s1;
 Servo s2;
 
-int motorPin1   = 3;
-int Laser1      = 7;
-int Detector1   = 12;
-int servo1      = 5;
-
-int motorPin2   = 11;
-int Laser2      = 4;
-int Detector2   = 2;
-int servo2      = 6;
-
-int motorSpeed1 = 255;
-int motorSpeed2 = 255;
+struct Player {
+  Servo servo;
+  int fanSpeed;
+  int fanPin;
+  int laserPin;
+  int detectorPin;
+  int servoPin;
+  int servoValue;
+};
+Player players[NB_PLAYERS] = {
+  { s1, 255, 3, 7, 12, 5, 0},
+  { s2, 255, 11, 4, 2, 6, 180}
+};
 
 void setup() {
-  s1.attach(servo1);
-  s2.attach(servo2);
-  pinMode(motorPin1, OUTPUT);
-  pinMode(motorPin2, OUTPUT);
-  pinMode(Laser1, OUTPUT);
-  pinMode(Detector1, INPUT);
-  pinMode(Laser2, OUTPUT);
-  pinMode(Detector2, INPUT);
-
-  digitalWrite(Laser1, HIGH);
-  digitalWrite(Laser2, HIGH);
-  analogWrite(motorPin1, motorSpeed1);
-  analogWrite(motorPin2, motorSpeed2);
-  s1.write(0);
-  s2.write(180);
+  initializePins();
   Serial.begin(9600);
+}
+
+void initializePins() {
+  for(int i = 0; i < NB_PLAYERS; i++) {
+    pinMode(players[i].fanPin, OUTPUT);
+    pinMode(players[i].laserPin, OUTPUT);
+    pinMode(players[i].detectorPin, INPUT);
+    digitalWrite(players[i].laserPin, HIGH);
+    analogWrite(players[i].fanPin, players[i].fanSpeed);
+    players[i].servo.attach(players[i].servoPin);
+    players[i].servo.write(players[i].servoValue);
+  }
 }
 
 void loop() {
   //  Lasers are currently broken
-  // checkEndGame(digitalRead(Detector1), PLAYER_ONE);
-  // checkEndGame(digitalRead(Detector2), PLAYER_TWO);
+  //  for(int i = 0; i < NB_PLAYERS; i++) {
+  //    checkEndGame(players[i], i);
+  //  }
 
   waitUntilDataIsAvailable();
   updateFanSpeed();
   delay(100);
 }
 
-void checkEndGame(int winPlayer, Players player) {
-  Servo servo = player == PLAYER_ONE ? s1: s2;
-  int finalFlagPosition = player == PLAYER_ONE ? 180: 0;
-
+void checkEndGame(Player player, int id) {
   // The player wins if the phototransistor doesn't detect the laser anymore.
-  if ( winPlayer == 0 ) {
-    analogWrite(motorPin1, 0);
-    analogWrite(motorPin2, 0);
+  if ( digitalRead(player.detectorPin) == 0 ) {    
+    analogWrite(player.fanPin, 0);
+    analogWrite(player.fanPin, 0);
 
-    servo.write(90);
+    player.servo.write(90);
     delay(2000);
-    servo.write(finalFlagPosition);
+    player.servoValue = id == 0 ? 180: 0;
+    player.servo.write(player.servoValue);
 
-    Serial.println("Player won : " + player);
+    Serial.println("Player won : " + id);
     while (1) { /* The game is finished */ }
   }
 }
 
 void waitUntilDataIsAvailable() {
-  while (Serial.available() < 2) {
+  while (Serial.available() < NB_PLAYERS) {
     delay(10);
   }
 }
 
 void updateFanSpeed() {
-  motorSpeed1 = Serial.read();
-  motorSpeed2 = Serial.read();
-  Serial.write(motorSpeed1);
-  Serial.write(motorSpeed2);
-  analogWrite(motorPin1, motorSpeed1 + MIN_FAN_SPEED);
-  analogWrite(motorPin2, motorSpeed2 + MIN_FAN_SPEED);
+  for(int i = 0; i < NB_PLAYERS; i++) {
+    players[i].fanSpeed = Serial.read();
+    Serial.write(players[i].fanSpeed);
+    analogWrite(players[i].fanPin, players[i].fanSpeed + MIN_FAN_SPEED);
+  }
 }
