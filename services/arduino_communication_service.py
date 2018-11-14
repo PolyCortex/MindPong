@@ -4,11 +4,11 @@ import time
 
 from serial_communication_service import SerialCommunicationService
 
-class ArduinoCommunicationService(SerialCommunicationService):
-    LOWER_BOUND = 0.05
-    UPPER_BOUND = 0.4
-    PADDING = 3
+LOWER_BOUND = 0.05
+UPPER_BOUND = 0.4
 
+class ArduinoCommunicationService(SerialCommunicationService):
+    
     def __init__(self):
         super(ArduinoCommunicationService, self).__init__()
 
@@ -29,13 +29,13 @@ class ArduinoCommunicationService(SerialCommunicationService):
             self.is_playing = False
     
     def get_clipped_signals(self, signals):
-        clipped_list = np.clip(signals, self.LOWER_BOUND, self.UPPER_BOUND)
+        clipped_list = np.clip(signals, LOWER_BOUND, UPPER_BOUND)
         return [
             self.get_clipped_value(x)
             for x in clipped_list
         ]
     
     def get_clipped_value(self, value):
-        return int(255 * (value - self.LOWER_BOUND)/(self.UPPER_BOUND - self.LOWER_BOUND))
+        return int(255 * (value - LOWER_BOUND)/(UPPER_BOUND - LOWER_BOUND))
 
 arduino_communication_service = ArduinoCommunicationService()
