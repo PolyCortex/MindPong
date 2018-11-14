@@ -20,7 +20,8 @@ class ArduinoCommunicationService(SerialCommunicationService):
         value_byte = bytes(bytearray(value_to_send))
 
         try:
-            print 'Reading', super(ArduinoCommunicationService, self).read_data()
+            received_data = str(super(ArduinoCommunicationService, self).read_data(2))  
+            print 'Reading', [ord(x) for x in received_data]
             print 'Sending', value_to_send
             super(ArduinoCommunicationService, self).send_data(value_byte)
             time.sleep(1)

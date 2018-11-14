@@ -1,7 +1,11 @@
 #include <Servo.h>
 
-int PLAYER_1 = 1;
-int PLAYER_2 = 2;
+enum Players {
+  PLAYER_ONE,
+  PLAYER_TWO
+};
+
+int MIN_FAN_SPEED = 50;
 
 Servo s1;
 Servo s2;
@@ -31,6 +35,8 @@ void setup() {
 
   digitalWrite(Laser1, HIGH);
   digitalWrite(Laser2, HIGH);
+  analogWrite(motorPin1, motorSpeed1);
+  analogWrite(motorPin2, motorSpeed2);
   s1.write(0);
   s2.write(180);
   Serial.begin(9600);
@@ -38,34 +44,43 @@ void setup() {
 
 void loop() {
   //  Lasers are currently broken
-  // checkEndGame(digitalRead(Detector1), PLAYER_1);
-  // checkEndGame(digitalRead(Detector2), PLAYER_2);
+  // checkEndGame(digitalRead(Detector1), PLAYER_ONE);
+  // checkEndGame(digitalRead(Detector2), PLAYER_TWO);
 
-  if (Serial.available()) {
-    motorSpeed1 = Serial.read();
-    motorSpeed2 = Serial.read();
-    Serial.println("RECEIVED : " + motorSpeed1);
-  }
-    
-  analogWrite(motorPin1, motorSpeed1);
-  analogWrite(motorPin2, motorSpeed2);
-
+  waitUntilDataIsAvailable();
+  updateFanSpeed();
   delay(100);
 }
 
-void checkEndGame(int winPlayer, int playerID) {
-  Servo servo = playerID == PLAYER_1 ? s1: s2;
-  int lastServoPosition = playerID == PLAYER_1 ? 180: 0;
-  if ( winPlayer == 0 ) {
+void checkEndGame(int winPlayer, Players player) {
+  Servo servo = player == PLAYER_ONE ? s1: s2;
+  int finalFlagPosition = player == PLAYER_ONE ? 180: 0;
 
+  // The player wins if the phototransistor doesn't detect the laser anymore.
+  if ( winPlayer == 0 ) {
     analogWrite(motorPin1, 0);
     analogWrite(motorPin2, 0);
 
     servo.write(90);
     delay(2000);
-    servo.write(lastServoPosition);
+    servo.write(finalFlagPosition);
 
-    Serial.println("Player won : " + playerID);
-    while (1) {}
+    Serial.println("Player won : " + player);
+    while (1) { /* The game is finished */ }
   }
+}
+
+void waitUntilDataIsAvailable() {
+  while (Serial.available() < 2) {
+    delay(10);
+  }
+}
+
+void updateFanSpeed() {
+  motorSpeed1 = Serial.read();
+  motorSpeed2 = Serial.read();
+  Serial.write(motorSpeed1);
+  Serial.write(motorSpeed2);
+  analogWrite(motorPin1, motorSpeed1 + MIN_FAN_SPEED);
+  analogWrite(motorPin2, motorSpeed2 + MIN_FAN_SPEED);
 }
