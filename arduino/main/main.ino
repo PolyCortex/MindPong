@@ -1,46 +1,83 @@
-int pinSwitch   = 3;
-int switchS = 0;
-int muse1 = 0;
-int motorPin1 = 10;
-int motorSpeed1 = 0;
-int muse2 = 0;
-int motorPin2 = 11;
-int motorSpeed2 = 0;
+#include <Servo.h>
 
+const int NB_PLAYERS = 2;
+const int BAUD_RATE = 9600;
 
-void setup() { 
-  Serial.begin(9600);
-  Serial.print("Hello Computer");
-}
+const int MIN_FAN_SPEED = 50;
+const int SERVO_RAISED_POSITION = 90;
 
-void loop() { 
-  if (Serial.available()) {
-    //Serial.println("RECEIVED");
-    String data = Serial.readString();
-    String dataP1 = data.substring(0,3);
-    String dataP2 = data.substring(3,6);
-    int museDataP1 = dataP1.toInt();
-    int museDataP2 = dataP2.toInt();
-    if (museDataP1 >= 100 and museDataP2 >= 100) {
-      motorSpeed1 = museDataP1 - 50;
-      Serial.println("Muse 1");
-      Serial.println(motorSpeed1);
-      motorSpeed2 = museDataP2 - 50;
-      Serial.println("Muse 2");
-      Serial.println(motorSpeed2);
-     }
+struct Player {
+  Servo servo;
+  int fanSpeed;
+  int fanPin;
+  int laserPin;
+  int detectorPin;
+  int servoPin;
+  int servoRestingPosition;
+};
+Player players[NB_PLAYERS] = {
+  { Servo(), 255, 3, 7, 12, 5, 0},
+  { Servo(), 255, 11, 4, 2, 6, 180}
+};
+
+void setup() {
+  for(int i = 0; i < NB_PLAYERS; i++) {
+    initializePinMode(players[i]);
+    initializeState(players[i]);
   }
   
-  switchS = digitalRead(pinSwitch);
-   
-  if (switchS == HIGH) { 
-    analogWrite(motorPin1, 0);
-    analogWrite(motorPin2, 0);
-    delay(100);
+  Serial.begin(BAUD_RATE);
+}
+
+void initializePinMode(Player player) {
+  pinMode(player.fanPin, OUTPUT);
+  pinMode(player.laserPin, OUTPUT);
+  pinMode(player.detectorPin, INPUT);
+  player.servo.attach(player.servoPin);
+}
+
+void initializeState(Player player) {
+  digitalWrite(player.laserPin, HIGH);
+  analogWrite(player.fanPin, player.fanSpeed);
+  player.servo.write(player.servoRestingPosition);
+}
+
+void loop() {
+  //  Lasers are currently broken
+  //  for(int i = 0; i < NB_PLAYERS; i++) {
+  //    checkEndGame(players[i]);
+  //  }
+
+  waitUntilDataIsAvailable();
+  updateFanSpeed();
+  delay(100);
+}
+
+void checkEndGame(Player player) {
+  if (hasWon(player)) {    
+    analogWrite(player.fanPin, 0);
+    analogWrite(player.fanPin, 0);
+    player.servo.write(SERVO_RAISED_POSITION);
+    delay(2000);
+    player.servo.write(player.servoRestingPosition);
+    while (true) { /* The game is finished */ }
   }
-  else {
-    analogWrite(motorPin1, motorSpeed1);
-    analogWrite(motorPin2, motorSpeed2);
-    delay(100);
+}
+
+bool hasWon(Player player) {
+  return digitalRead(player.detectorPin) == LOW;
+}
+
+void waitUntilDataIsAvailable() {
+  while (Serial.available() < NB_PLAYERS) {
+    delay(10);
+  }
+}
+
+void updateFanSpeed() {
+  for(int i = 0; i < NB_PLAYERS; i++) {
+    players[i].fanSpeed = Serial.read();
+    Serial.write(players[i].fanSpeed);
+    analogWrite(players[i].fanPin, constrain(players[i].fanSpeed + MIN_FAN_SPEED, 0, 255));
   }
 }

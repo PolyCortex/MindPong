@@ -1,37 +1,49 @@
-import serial
+from serial import Serial, SerialTimeoutException
+
+BAUD_RATE = 9600
+PORT = 'COM5'
+READ_TIMEOUT = 1
 
 class SerialCommunicationService(object):
-    BAUD = 9600
-    PORT = 'COM6'
+    is_connected = False
+    _serial_channel = None
 
-    def __init__(self):
-        self.serial_channel = None
-        self.is_connected = False
 
     def establish_communication(self):
         try: 
-            self.serial_channel = serial.Serial()
-            self.serial_channel.port = self.PORT
-            self.serial_channel.baudrate = self.BAUD
-            self.serial_channel.readable()
-            self.serial_channel.timeout = 1
-            self.serial_channel.open()
-        except Exception as e:
-            print 'SerialCommunicationService: Could not connect to port ' + self.PORT
-            print e
-            raise(e)
+            self._serial_channel = Serial(port=PORT, baudrate=BAUD_RATE, timeout=READ_TIMEOUT)
+        except Exception as error:
+            print "Error when creating serial %s port: %s" %(PORT, error.message)
+            raise(error)
+
+        if not self._serial_channel.is_open:
+            self._serial_channel.open()
         self.is_connected = True
 
+
     def close_communication(self):
-        if self.serial_channel is not None:
-            self.serial_channel.close()
+        if self._serial_channel is not None:
+            self._serial_channel.close()
             self.is_connected = False
 
-    def read_data(self):
-        while self.serial_channel.in_waiting:
-            return self.serial_channel.readline()
+
+    def is_data_available(self):
+        return self._serial_channel.in_waiting
+
+
+    def read_data(self, nb_bytes=1):
+        bytes_received = self._serial_channel.read(nb_bytes)
+        if bytes_received is not None:
+            return [ord(byte) for byte in str(bytes_received)]
+            
+        return None
+
 
     def send_data(self, data):
-        self.serial_channel.write(data)
+        try:
+            self._serial_channel.write(data)
+        except SerialTimeoutException as e:
+            print 'Error when sending data to microcontroller:', str(e)
+
 
 serial_communication_service = SerialCommunicationService()

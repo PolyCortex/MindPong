@@ -1,32 +1,32 @@
+import struct
 import numpy as np
 import time
 
 from serial_communication_service import SerialCommunicationService
 
-class ArduinoCommunicationService(SerialCommunicationService):
-    LOWER_BOUND = 0.05
-    UPPER_BOUND = 0.4
+LOWER_BOUND = 0.05
+UPPER_BOUND = 0.4
 
-    def __init__(self):
-        super(ArduinoCommunicationService, self).__init__()
+class ArduinoCommunicationService(SerialCommunicationService):
 
     def send_data(self, data):
-        if not self.is_connected or self.serial_channel is None:
+        if not self.is_connected:
             return
 
-        sent_value = ""
-        relative_beta_list = np.clip(data, self.LOWER_BOUND, self.UPPER_BOUND)
-        for relative_beta in relative_beta_list:
-            sent_value += str(100 + int((relative_beta - self.LOWER_BOUND)/(self.UPPER_BOUND - self.LOWER_BOUND) * 255))
+        if super(ArduinoCommunicationService, self).is_data_available():
+            print 'Reading', super(ArduinoCommunicationService, self).read_data(2)
 
-        try:
-            print 'Reading', super(ArduinoCommunicationService, self).read_data()
-            print 'Sending', sent_value
-            super(ArduinoCommunicationService, self).send_data(sent_value)
-            time.sleep(1)
-        except Exception as e:
-            print 'Error when sending data to microcontroller:', str(e)
-            self.is_playing = False
+        value_to_send = self._get_clipped_signals(data)
+        print 'Sending', value_to_send
+        super(ArduinoCommunicationService, self).send_data(bytearray(value_to_send))
     
+
+    def _get_clipped_signals(self, signals):
+        clipped_list = np.clip(signals, LOWER_BOUND, UPPER_BOUND)
+        return [self._get_clipped_value(x) for x in clipped_list]
+    
+
+    def _get_clipped_value(self, value):
+        return int(255 * (value - LOWER_BOUND)/(UPPER_BOUND - LOWER_BOUND))
 
 arduino_communication_service = ArduinoCommunicationService()
