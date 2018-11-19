@@ -8,31 +8,25 @@ LOWER_BOUND = 0.05
 UPPER_BOUND = 0.4
 
 class ArduinoCommunicationService(SerialCommunicationService):
-    
-    def __init__(self):
-        super(ArduinoCommunicationService, self).__init__()
 
     def send_data(self, data):
-        if not self.is_connected or self.serial_channel is None:
+        if not self.is_connected:
             return
 
-        value_to_send = self.get_clipped_signals(data)
-        value_byte = bytes(bytearray(value_to_send))
+        if super(ArduinoCommunicationService, self).is_data_available():
+            print 'Reading', super(ArduinoCommunicationService, self).read_data(2)
 
-        try:
-            if super(ArduinoCommunicationService, self).is_data_available():
-                print 'Reading', super(ArduinoCommunicationService, self).read_data(2)
-            print 'Sending', value_to_send
-            super(ArduinoCommunicationService, self).send_data(value_byte)
-        except Exception as e:
-            print 'Error when sending data to microcontroller:', str(e)
-            self.is_playing = False
+        value_to_send = self._get_clipped_signals(data)
+        print 'Sending', value_to_send
+        super(ArduinoCommunicationService, self).send_data(bytearray(value_to_send))
     
-    def get_clipped_signals(self, signals):
+
+    def _get_clipped_signals(self, signals):
         clipped_list = np.clip(signals, LOWER_BOUND, UPPER_BOUND)
-        return [self.get_clipped_value(x) for x in clipped_list]
+        return [self._get_clipped_value(x) for x in clipped_list]
     
-    def get_clipped_value(self, value):
+
+    def _get_clipped_value(self, value):
         return int(255 * (value - LOWER_BOUND)/(UPPER_BOUND - LOWER_BOUND))
 
 arduino_communication_service = ArduinoCommunicationService()
