@@ -27,9 +27,15 @@ class SerialCommunicationService(object):
             self.serial_channel.close()
             self.is_connected = False
 
+    def is_data_available(self):
+        return self.serial_channel.in_waiting
+
     def read_data(self, nb_bytes=1):
-        while self.serial_channel.in_waiting:
-            return self.serial_channel.read(nb_bytes)
+        bytes_received = self.serial_channel.read(nb_bytes)
+        if bytes_received is not None:
+            return [ord(byte) for byte in str(bytes_received)]
+            
+        return None
 
     def send_data(self, data):
         self.serial_channel.write(data)

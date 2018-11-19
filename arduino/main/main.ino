@@ -1,8 +1,9 @@
 #include <Servo.h>
-#define NB_PLAYERS 2
+
+const int NB_PLAYERS = 2;
+const int BAUD_RATE = 9600;
 
 const int MIN_FAN_SPEED = 50;
-const int BAUD_RATE = 9600;
 const int SERVO_RAISED_POSITION = 90;
 
 struct Player {
@@ -20,20 +21,25 @@ Player players[NB_PLAYERS] = {
 };
 
 void setup() {
-  initializePins();
+  for(int i = 0; i < NB_PLAYERS; i++) {
+    initializePinMode(players[i]);
+    initializeState(players[i]);
+  }
+  
   Serial.begin(BAUD_RATE);
 }
 
-void initializePins() {
-  for(int i = 0; i < NB_PLAYERS; i++) {
-    pinMode(players[i].fanPin, OUTPUT);
-    pinMode(players[i].laserPin, OUTPUT);
-    pinMode(players[i].detectorPin, INPUT);
-    digitalWrite(players[i].laserPin, HIGH);
-    analogWrite(players[i].fanPin, players[i].fanSpeed);
-    players[i].servo.attach(players[i].servoPin);
-    players[i].servo.write(players[i].servoRestingPosition);
-  }
+void initializePinMode(Player player) {
+  pinMode(player.fanPin, OUTPUT);
+  pinMode(player.laserPin, OUTPUT);
+  pinMode(player.detectorPin, INPUT);
+  player.servo.attach(player.servoPin);
+}
+
+void initializeState(Player player) {
+  digitalWrite(player.laserPin, HIGH);
+  analogWrite(player.fanPin, player.fanSpeed);
+  player.servo.write(player.servoRestingPosition);
 }
 
 void loop() {
@@ -48,15 +54,18 @@ void loop() {
 }
 
 void checkEndGame(Player player) {
-  // The player wins if the phototransistor doesn't detect the laser anymore.
-  if ( digitalRead(player.detectorPin) == 0 ) {    
+  if (hasWon(player)) {    
     analogWrite(player.fanPin, 0);
     analogWrite(player.fanPin, 0);
     player.servo.write(SERVO_RAISED_POSITION);
     delay(2000);
     player.servo.write(player.servoRestingPosition);
-    while (1) { /* The game is finished */ }
+    while (true) { /* The game is finished */ }
   }
+}
+
+bool hasWon(Player player) {
+  return digitalRead(player.detectorPin) == LOW;
 }
 
 void waitUntilDataIsAvailable() {
@@ -69,6 +78,6 @@ void updateFanSpeed() {
   for(int i = 0; i < NB_PLAYERS; i++) {
     players[i].fanSpeed = Serial.read();
     Serial.write(players[i].fanSpeed);
-    analogWrite(players[i].fanPin, players[i].fanSpeed + MIN_FAN_SPEED);
+    analogWrite(players[i].fanPin, constrain(players[i].fanSpeed + MIN_FAN_SPEED, 0, 255));
   }
 }

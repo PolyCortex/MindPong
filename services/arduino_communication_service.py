@@ -20,21 +20,17 @@ class ArduinoCommunicationService(SerialCommunicationService):
         value_byte = bytes(bytearray(value_to_send))
 
         try:
-            received_data = str(super(ArduinoCommunicationService, self).read_data(2))  
-            print 'Reading', [ord(x) for x in received_data]
+            if super(ArduinoCommunicationService, self).is_data_available():
+                print 'Reading', super(ArduinoCommunicationService, self).read_data(2)
             print 'Sending', value_to_send
             super(ArduinoCommunicationService, self).send_data(value_byte)
-            time.sleep(1)
         except Exception as e:
             print 'Error when sending data to microcontroller:', str(e)
             self.is_playing = False
     
     def get_clipped_signals(self, signals):
         clipped_list = np.clip(signals, LOWER_BOUND, UPPER_BOUND)
-        return [
-            self.get_clipped_value(x)
-            for x in clipped_list
-        ]
+        return [self.get_clipped_value(x) for x in clipped_list]
     
     def get_clipped_value(self, value):
         return int(255 * (value - LOWER_BOUND)/(UPPER_BOUND - LOWER_BOUND))
