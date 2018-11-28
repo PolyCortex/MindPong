@@ -14,6 +14,7 @@ from services.arduino_communication_service import arduino_communication_service
 MUSE_BAND_POWER_ACQUISITION_FREQUENCY = 10
 MUSE_NUMBER_ELECTRODES = 4
 NUMBER_PLAYERS = 2
+FIRST_PLAYER_PORT = 5001
 
 def run_server(port, signal):
     try:
@@ -24,8 +25,9 @@ def run_server(port, signal):
     except Exception as e:
         print("Caught error while creating server: %s" % e.message)
 
+
 def update_data(signals, callbacks):
-    update_period = 1 / signals[0].estimated_acquisition_freq
+    update_period = 1.0 / signals[0].estimated_acquisition_freq
     last_update_time = time()
     signal_means = [0, 0]
 
@@ -34,15 +36,14 @@ def update_data(signals, callbacks):
         if current_time - last_update_time > update_period:
             last_update_time = current_time
             try:
-
                 signal_means = [get_signals_mean(signal) for signal in signals]
             except Exception as e:
-                print (e);
-
+                print (e)
             for callback in callbacks:
                 callback(signal_means)
         else:
-            sleep(update_period)
+            sleep(update_period/10)
+        
 
 def get_signals_mean(signal):
     if signal.lock is not None:
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     ]
 
     for index, signal in enumerate(signals):
-        run_server((5000 + index), signal)
+        run_server((FIRST_PLAYER_PORT + index), signal)
 
     try:
         thread.start_new_thread(update_data, (signals, update_data_callbacks))
