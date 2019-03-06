@@ -8,6 +8,8 @@ import sys
 
 
 class MainMenu(QMainWindow):
+
+    # Class attributes/constants
     Y_COORD_UPPER_BOUND = 1080  # random value based on my screen dimensions
     X_COORD_UPPER_BOUND = 1920  # random value based on my screen dimensions
     DEFAULT_MENU_HEIGHT = 800
@@ -17,9 +19,10 @@ class MainMenu(QMainWindow):
         super().__init__()
         self._currentDirectory = os.path.dirname(os.path.realpath(__file__))
         self._logoPath = self._currentDirectory + os.path.sep + 'Images' + os.path.sep + 'logo_polyCortex.png'
-        self._menuWidth = 800
-        self._menuHeight = 640
         self.init_ui()
+        self.settingTab = None
+        self.playTab = None
+        self.statsTab = None
 
     @property
     def current_directory(self):
