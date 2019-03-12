@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QTabWidget
 
 
-class StatsTab(QWidget):
+class StatsTab(QTabWidget):
 
     def __init__(self):
         super().__init__()
