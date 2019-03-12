@@ -12,24 +12,30 @@ from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel
 
 class PlayTab(QTabWidget):
 
+    PLAYER_ONE_POSITION = 0
+    PLAYER_TWO_POSITION = 1
+
     def __init__(self):
         super().__init__()
-        self.plotWidget = PlotWidget()
+        self.centralLayout = QGridLayout()
         self.init_ui()
 
     def init_ui(self):
-        parent_layout = QGridLayout()
-        parent_layout.addWidget(self.plotWidget)
-        self.add_sub_layout(parent_layout)
-        self.setLayout(parent_layout)
+        self.add_sub_layout(self.centralLayout, PlayTab.PLAYER_ONE_POSITION)
+        self.add_sub_layout(self.centralLayout, PlayTab.PLAYER_TWO_POSITION)
+        self.setLayout(self.centralLayout)
 
-    def add_sub_layout(self, parent_layout):
-        label = QLabel("allo")
+    @staticmethod
+    def add_sub_layout(parent_layout, layout_col_position):
+        player_name = "Player " + str(layout_col_position + 1)
+        player_label = QLabel(player_name)
+        player_plot = PlotWidget()
         layout = QGridLayout()
-        layout.addWidget(label)
+        layout.addWidget(player_label)
+        layout.addWidget(player_plot)
         group_box = QGroupBox()
         group_box.setLayout(layout)
-        parent_layout.addWidget(group_box)
+        parent_layout.addWidget(group_box, 0, layout_col_position)
 
 
 class PlotWidget(QWidget):
@@ -37,11 +43,9 @@ class PlotWidget(QWidget):
     def __init__(self):
         super().__init__()
         layout = QGridLayout(self)
-        self.q =np.random.random(200)
+        self.q = np.random.random(200)
         plot = pg.PlotWidget()
         layout.addWidget(plot)
         self.curve = plot.plot(self.q)
 
-    def update(self):
-        self.curve.setData(self.q)
 
