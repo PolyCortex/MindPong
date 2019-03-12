@@ -5,6 +5,7 @@ import os
 from App.PlayTab import PlayTab
 from App.SettingsTab import SettingsTab
 from App.StatsTab import StatsTab
+import emoji
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon
 import sys
@@ -60,9 +61,9 @@ class MainMenu(QMainWindow):
         self.show()
 
     def init_tabs(self):
-        self.tabWidget.addTab(self.statsTab, "Statistics")
-        self.tabWidget.addTab(self.playTab, "Play")
-        self.tabWidget.addTab(self.settingsTab, "Settings")
+        self.tabWidget.addTab(self.statsTab, "📊 Statistics")
+        self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
+        self.tabWidget.addTab(self.settingsTab, emoji.emojize(" ⚙ Settings"))
 
 
 if __name__ == '__main__':
