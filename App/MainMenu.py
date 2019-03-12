@@ -45,7 +45,6 @@ class MainMenu(QMainWindow):
         screen = QDesktopWidget().screenGeometry()
         print(screen.width(), screen.height())
         size = self.geometry()
-        print(size)
         self.move((screen.width() - size.width()) / 2,
                   (screen.height() - size.height()) / 2)
 
