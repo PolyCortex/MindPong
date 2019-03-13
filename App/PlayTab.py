@@ -3,6 +3,7 @@ import emoji
 import numpy as np
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton
+import time
 
 
 class PlayTab(QTabWidget):
@@ -74,10 +75,11 @@ class PlotWidget(QWidget):
         super().__init__()
         layout = QGridLayout(self)
         self.plot = pg.PlotWidget()
-        self.deque = deque(np.zeros(100), maxlen=100)
+        self.set_curve_axis()
+        self.deque = deque(maxlen=1000)
         self.curve = self.plot.plot()
         self.timer = pg.QtCore.QTimer()
-        self.set_curve_axis()
+        self.timeCount = 0
         layout.addWidget(self.plot)
 
     def set_curve_axis(self):
@@ -85,13 +87,32 @@ class PlotWidget(QWidget):
         self.plot.plotItem.setLabel("bottom", "Temps", "s")
 
     def update(self):
-        self.deque.append(np.random.random())
-        self.curve.setData(self.deque)
+        self.timeCount += 1
+        dataTuple1 = (self.timeCount, np.random.random())
+        self.timeCount += 1
+        dataTuple2 = (self.timeCount, np.random.random())
+        self.timeCount += 1
+        dataTuple3 = (self.timeCount, np.random.random())
+        self.deque.append(dataTuple1)
+        self.deque.append(dataTuple2)
+        self.deque.append(dataTuple3)
+        min_val: int
+        max_val: int
+        time_array = []
+        data_array = []
+        for data_tuple in self.deque:
+            time_array.append(data_tuple[0])
+            data_array.append(data_tuple[1])
+
+        min_val = min(time_array)
+        max_val = max(time_array)
+        # timestamps = np.linspace(min_val, max_val, 3)
+        self.curve.setData(x=time_array, y=data_array)
 
     def start_timer(self):
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(10)
+        self.timer.start(12)
 
     def stop_timer(self):
         self.timer.stop()
