@@ -77,7 +77,12 @@ class PlotWidget(QWidget):
         self.deque = deque(np.zeros(100), maxlen=100)
         self.curve = self.plot.plot()
         self.timer = pg.QtCore.QTimer()
+        self.set_curve_axis()
         layout.addWidget(self.plot)
+
+    def set_curve_axis(self):
+        self.plot.plotItem.setLabel("left", "Amplitude", "mV")
+        self.plot.plotItem.setLabel("bottom", "Temps", "s")
 
     def update(self):
         self.deque.append(np.random.random())
