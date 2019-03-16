@@ -2,6 +2,7 @@ from collections import deque
 import emoji
 import numpy as np
 import pyqtgraph as pg
+from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton, QMainWindow
 import time
 
@@ -25,10 +26,7 @@ class PlayTab(QTabWidget):
 
     def init_ui(self):
         self.set_player_layouts(self.centralLayout)
-        self.centralLayout.addWidget(self.playButton, 1, 0, 1, 1)
-        self.playButton.clicked.connect(self.click_start_button_callback)
-        self.centralLayout.addWidget(self.restartButton, 1, 1, 1, 1)
-        self.restartButton.clicked.connect(self.click_restart_button_callback)
+        self.set_buttons()
         self.setLayout(self.centralLayout)
 
     def set_player_layouts(self, parent_layout):
@@ -55,6 +53,13 @@ class PlayTab(QTabWidget):
         group_box_player2.setLayout(layout_player2)
         parent_layout.addWidget(group_box_player2, 0, PlayTab.P_TWO)
 
+    def set_buttons(self):
+        self.playButton.setStyleSheet("background-color: #00a443")
+        self.centralLayout.addWidget(self.playButton, 1, 0, 1, 1)
+        self.playButton.clicked.connect(self.click_start_button_callback)
+        self.centralLayout.addWidget(self.restartButton, 1, 1, 1, 1)
+        self.restartButton.clicked.connect(self.click_restart_button_callback)
+
     def click_start_button_callback(self):
         if self.gameState == 0:
             self.playButton.setText(PlayTab.STOP_GAME_STRING)
@@ -78,7 +83,6 @@ class PlayTab(QTabWidget):
                 plotWidget.timeCount = 0
         self.gameState = 0
         self.click_start_button_callback()
-
 
 
 class PlotWidget(QWidget):
