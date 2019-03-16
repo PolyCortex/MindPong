@@ -75,7 +75,10 @@ class PlayTab(QTabWidget):
         if self.playerPlotWidget[0].deque or self.playerPlotWidget[1].deque:
             for plotWidget in self.playerPlotWidget:
                 plotWidget.deque.clear()
-        self.gameState = 0;
+                plotWidget.timeCount = 0
+        self.gameState = 0
+        self.click_start_button_callback()
+
 
 
 class PlotWidget(QWidget):
