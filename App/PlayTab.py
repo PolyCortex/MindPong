@@ -2,8 +2,8 @@ from collections import deque
 import emoji
 import numpy as np
 import pyqtgraph as pg
-from PyQt5.QtGui import QPalette
-from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton, QMainWindow
+from PyQt5.QtGui import QPalette, QWindow
+from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton, QMainWindow, QDialog
 import time
 
 
@@ -21,6 +21,7 @@ class PlayTab(QTabWidget):
         self.playButton = QPushButton(emoji.emojize(PlayTab.START_GAME_STRING))
         self.restartButton = QPushButton(emoji.emojize(PlayTab.RESTART_GAME_STRING))
         self.playerPlotWidget = [PlotWidget(), PlotWidget()]
+        self.countDownModal = QDialog(self)
         self.gameState = 0
         self.init_ui()
 
@@ -81,6 +82,12 @@ class PlayTab(QTabWidget):
             for plotWidget in self.playerPlotWidget:
                 plotWidget.deque.clear()
                 plotWidget.timeCount = 0
+
+        # self.countDownWindow
+        self.countDownModal.setStyleSheet("opacity: 0.1")
+        self.countDownModal.setModal(True)
+        # self.countDownModal.show()
+
         self.gameState = 0
         self.click_start_button_callback()
 
