@@ -12,19 +12,23 @@ class PlayTab(QTabWidget):
 
     START_GAME_STRING = "▶️   Start Game"
     STOP_GAME_STRING = "⏹️   Stop Game "
+    RESTART_GAME_STRING = "⟳ Restart Game"
 
     def __init__(self):
         super().__init__()
         self.centralLayout = QGridLayout()
         self.playButton = QPushButton(emoji.emojize(PlayTab.START_GAME_STRING))
+        self.restartButton = QPushButton(emoji.emojize(PlayTab.RESTART_GAME_STRING))
         self.playerPlotWidget = [PlotWidget(), PlotWidget()]
         self.gameState = 0
         self.init_ui()
 
     def init_ui(self):
         self.set_player_layouts(self.centralLayout)
-        self.centralLayout.addWidget(self.playButton, 1, 0, 1, 2)
-        self.playButton.clicked.connect(self.click_button_callback)
+        self.centralLayout.addWidget(self.playButton, 1, 0, 1, 1)
+        self.playButton.clicked.connect(self.click_start_button_callback)
+        self.centralLayout.addWidget(self.restartButton, 1, 1, 1, 1)
+        self.restartButton.clicked.connect(self.click_restart_button_callback)
         self.setLayout(self.centralLayout)
 
     def set_player_layouts(self, parent_layout):
@@ -51,7 +55,7 @@ class PlayTab(QTabWidget):
         group_box_player2.setLayout(layout_player2)
         parent_layout.addWidget(group_box_player2, 0, PlayTab.P_TWO)
 
-    def click_button_callback(self):
+    def click_start_button_callback(self):
         if self.gameState == 0:
             self.playButton.setText(PlayTab.STOP_GAME_STRING)
             self.playerPlotWidget[PlayTab.P_ONE].start_timer()
@@ -66,6 +70,12 @@ class PlayTab(QTabWidget):
 
         else:
             print("error in game state \n")
+
+    def click_restart_button_callback(self):
+        if self.playerPlotWidget[0].deque or self.playerPlotWidget[1].deque:
+            for plotWidget in self.playerPlotWidget:
+                plotWidget.deque.clear()
+        self.gameState = 0;
 
 
 class PlotWidget(QWidget):
