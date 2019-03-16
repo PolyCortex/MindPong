@@ -43,7 +43,6 @@ class MainMenu(QMainWindow):
 
     def center_menu(self):
         screen = QDesktopWidget().screenGeometry()
-        print(screen.width(), screen.height())
         size = self.geometry()
         self.move((screen.width() - size.width()) / 2,
                   (screen.height() - size.height()) / 2)

@@ -2,12 +2,11 @@ from collections import deque
 import emoji
 import numpy as np
 import pyqtgraph as pg
-from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton, QMainWindow
 import time
 
 
 class PlayTab(QTabWidget):
-
     P_ONE = 0
     P_TWO = 1
 
@@ -24,7 +23,7 @@ class PlayTab(QTabWidget):
 
     def init_ui(self):
         self.set_player_layouts(self.centralLayout)
-        self.centralLayout.addWidget(self.playButton)
+        self.centralLayout.addWidget(self.playButton, 1, 0, 1, 2)
         self.playButton.clicked.connect(self.click_button_callback)
         self.setLayout(self.centralLayout)
 
@@ -88,14 +87,14 @@ class PlotWidget(QWidget):
 
     def update(self):
         self.timeCount += 1
-        dataTuple1 = (self.timeCount, np.random.random())
+        data_tuple1 = (self.timeCount, np.random.random())
         self.timeCount += 1
-        dataTuple2 = (self.timeCount, np.random.random())
+        data_tuple2 = (self.timeCount, np.random.random())
         self.timeCount += 1
-        dataTuple3 = (self.timeCount, np.random.random())
-        self.deque.append(dataTuple1)
-        self.deque.append(dataTuple2)
-        self.deque.append(dataTuple3)
+        data_tuple3 = (self.timeCount, np.random.random())
+        self.deque.append(data_tuple1)
+        self.deque.append(data_tuple2)
+        self.deque.append(data_tuple3)
         min_val: int
         max_val: int
         time_array = []
@@ -104,9 +103,9 @@ class PlotWidget(QWidget):
             time_array.append(data_tuple[0])
             data_array.append(data_tuple[1])
 
-        min_val = min(time_array)
-        max_val = max(time_array)
-        # timestamps = np.linspace(min_val, max_val, 3)
+        # min_val = min(time_array)
+        # max_val = max(time_array)
+        # timestamps = np.linspace(min_val, max_val, 1000)
         self.curve.setData(x=time_array, y=data_array)
 
     def start_timer(self):
@@ -116,4 +115,3 @@ class PlotWidget(QWidget):
 
     def stop_timer(self):
         self.timer.stop()
-
