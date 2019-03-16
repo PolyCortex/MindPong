@@ -1,2 +1,4 @@
+pyqtgraph
+numpy
 emoji
 PyQt5
