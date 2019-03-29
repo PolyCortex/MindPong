@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-from App.PlayTab import PlayTab
-from App.SettingsTab import SettingsTab
-from App.StatsTab import StatsTab
+import sys
+from mindpong.PlayTab import PlayTab
+from mindpong.SettingsTab import SettingsTab
+from mindpong.StatsTab import StatsTab
 import emoji
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon
-import sys
 
 
 class MainMenu(QMainWindow):
@@ -22,8 +22,7 @@ class MainMenu(QMainWindow):
     def __init__(self):
         super().__init__()
         # attributes:
-        self._currentDirectory = os.path.dirname(os.path.realpath(__file__))
-        self._logoPath = self._currentDirectory + os.path.sep + 'Images' + os.path.sep + 'logo_polyCortex.png'
+        self._logoPath = 'img_src'+ os.path.sep + 'Images' + os.path.sep + 'logo_polyCortex.png'
         self.centralWidget = QWidget()
         self.tabWidget = QTabWidget()
         self.vBoxLayout = QVBoxLayout()
@@ -35,7 +34,7 @@ class MainMenu(QMainWindow):
 
     @property
     def current_directory(self):
-        return self._currentDirectory
+        return os.path.dirname(os.path.realpath(__file__))
 
     @property
     def logo_path(self):
@@ -56,7 +55,6 @@ class MainMenu(QMainWindow):
         self.center_menu()
         self.setWindowTitle('MindPong')
         self.setWindowIcon(QIcon(self._logoPath))
-        self.show()
 
     def init_tabs(self):
         self.tabWidget.addTab(self.statsTab, "📊 Statistics")
