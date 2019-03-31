@@ -19,7 +19,6 @@ class PlayTab(QTabWidget):
         super().__init__()
         self.centralLayout = QGridLayout()
         self.playButton = QPushButton(emoji.emojize(PlayTab.START_GAME_STRING))
-        self.restartButton = QPushButton(emoji.emojize(PlayTab.RESTART_GAME_STRING))
         self.playerPlotWidget = [PlotWidget(), PlotWidget()]
         self.countDownModal = QDialog(self)
         self.gameState = 0
@@ -58,18 +57,18 @@ class PlayTab(QTabWidget):
         self.playButton.setStyleSheet("background-color: #00a443")
         self.centralLayout.addWidget(self.playButton, 1, 0, 1, 1)
         self.playButton.clicked.connect(self.click_start_button_callback)
-        self.centralLayout.addWidget(self.restartButton, 1, 1, 1, 1)
-        self.restartButton.clicked.connect(self.click_restart_button_callback)
 
     def click_start_button_callback(self):
         if self.gameState == 0:
             self.playButton.setText(PlayTab.STOP_GAME_STRING)
+            self.playButton.setStyleSheet("background-color: #ff0000")
             self.playerPlotWidget[PlayTab.P_ONE].start_timer()
             self.playerPlotWidget[PlayTab.P_TWO].start_timer()
             self.gameState = 1
 
         elif self.gameState == 1:
             self.playButton.setText(PlayTab.START_GAME_STRING)
+            self.playButton.setStyleSheet("background-color: #00a443")
             self.playerPlotWidget[PlayTab.P_ONE].stop_timer()
             self.playerPlotWidget[PlayTab.P_TWO].stop_timer()
             self.gameState = 0
