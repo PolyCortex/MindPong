@@ -2,6 +2,7 @@ pyqtgraph
 numpy
 emoji
 PyQt5
+pyserial
 
 git+git://github.com/PolyCortex/pyMuse.git@feature/update-to-py3/base
 python-osc>=1.7.0
