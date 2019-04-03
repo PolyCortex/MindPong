@@ -20,10 +20,8 @@ class MainMenu(QMainWindow):
     DEFAULT_MENU_HEIGHT = 800
     DEFAULT_MENU_WIDTH = 640
 
-    def __init__(self, game: Game):
+    def __init__(self):
         super().__init__()
-        # model binding:
-        self.game = game
         # attributes:
         self._logoPath = 'img_src'+ os.path.sep + 'Images' + os.path.sep + 'logo_polyCortex.png'
         self.centralWidget = QWidget()
@@ -64,8 +62,11 @@ class MainMenu(QMainWindow):
         self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
         self.tabWidget.addTab(self.settingsTab, emoji.emojize(" ⚙ Settings"))
 
+    def set_delegate(self, delegate):
+        self.delegate = delegate
+
     def closeEvent(self, event):
-        self.game.state = GameState.INITIAL
+        self.delegate.end_game()
 
 
 if __name__ == '__main__':
