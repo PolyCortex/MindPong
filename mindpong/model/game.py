@@ -10,7 +10,7 @@ from mindpong.model.player import Player, SIGNAL_NAMES
 
 DEFAULT_PORT_PLAYER_ONE = 5001
 DEFAULT_PORT_PLAYER_TWO = 5002
-TIMEOUT_READ_DATA = 0.01  # seconds
+TIMEOUT_READ_DATA = 0.05  # seconds
 
 
 class GameState(Enum):

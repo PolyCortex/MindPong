@@ -62,7 +62,7 @@ class SerialCommunication():
     def send_data(self, data):
         """ prints feedback data from the arduino and sends the new data """
         if self._is_data_available():
-            print(self._read_bytes(len(data)))
+            print(("Reading : ", self._read_bytes(len(data))))
 
         data = [x[1] for x in data]
 
@@ -94,11 +94,11 @@ class SerialCommunication():
 
 
     def _read_bytes(self, nb_bytes=1):
-        bytes_received = self._serial_channel.read(nb_bytes)
-        if bytes_received is not None:
-            return [ord(byte) for byte in str(bytes_received)]
-        
-        return None
+        bytes_received = []
+        for _ in range(nb_bytes):
+            bytes_received.append(self._serial_channel.read(1))
+
+        return [ord(byte) for byte in bytes_received if byte]        
 
 
     def _is_data_available(self):
