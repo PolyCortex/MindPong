@@ -58,14 +58,13 @@ class SerialCommunication():
             print("Error when creating serial %s port" % (self._serial_channel.port))
             raise(error)
 
-        self.is_connected = True
-
 
     def send_data(self, data):
         """ prints feedback data from the arduino and sends the new data """
-        
-        if self._serial_channel.is_open and self._serial_channel.in_waiting:
+        if self._is_data_available():
             print(self._read_bytes(len(data)))
+
+        data = [x[1] for x in data]
 
         if self._is_data_valid(data):
             value_to_send = self._get_clipped_signals(data)
@@ -73,8 +72,7 @@ class SerialCommunication():
             try:
                 self._serial_channel.write(bytearray(value_to_send))
             except SerialTimeoutException as e:
-                print('Error when sending data to microcontroller:' + str(e))
-        
+                print('Error when sending data to microcontroller:' + str(e))        
 
 
     def close_communication(self):
@@ -103,8 +101,12 @@ class SerialCommunication():
         return None
 
 
+    def _is_data_available(self):
+        return self._serial_channel is not None and self._serial_channel.is_open and self._serial_channel.in_waiting
+
+
     def _is_data_valid(self, data):
-        return self._serial_channel is not None and self._serial_channel.is_open and not any(np.isnan(data))
+        return self._serial_channel is not None and self._serial_channel.is_open and not np.any(np.isnan(data))
 
 
     def _get_clipped_signals(self, signals):
