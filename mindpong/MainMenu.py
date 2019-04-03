@@ -10,6 +10,7 @@ import emoji
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon
 
+from mindpong.model.game import Game, GameState
 
 class MainMenu(QMainWindow):
 
@@ -19,8 +20,10 @@ class MainMenu(QMainWindow):
     DEFAULT_MENU_HEIGHT = 800
     DEFAULT_MENU_WIDTH = 640
 
-    def __init__(self):
+    def __init__(self, game: Game):
         super().__init__()
+        # model binding:
+        self.game = game
         # attributes:
         self._logoPath = 'img_src'+ os.path.sep + 'Images' + os.path.sep + 'logo_polyCortex.png'
         self.centralWidget = QWidget()
@@ -60,6 +63,9 @@ class MainMenu(QMainWindow):
         self.tabWidget.addTab(self.statsTab, "📊 Statistics")
         self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
         self.tabWidget.addTab(self.settingsTab, emoji.emojize(" ⚙ Settings"))
+
+    def closeEvent(self, event):
+        self.game.state = GameState.INITIAL
 
 
 if __name__ == '__main__':
