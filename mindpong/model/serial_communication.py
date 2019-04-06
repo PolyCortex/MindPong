@@ -55,7 +55,7 @@ class SerialCommunication():
         try:
             self._serial_channel.open()
         except SerialException as error:
-            print("Error when creating serial %s port" % (self._serial_channel.port))
+            print("Error when connecting to serial %s port" % (self._serial_channel.port))
             raise(error)
 
 
