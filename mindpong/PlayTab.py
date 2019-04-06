@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel,
     QVBoxLayout, QHBoxLayout
 import time
 
+from mindpong.utils import get_project_root
 
 class PlayTab(QTabWidget):
 
@@ -17,8 +18,7 @@ class PlayTab(QTabWidget):
 
     def __init__(self):
         super().__init__()
-        self.currentDirectory = os.path.dirname(os.path.realpath(__file__))
-        self.arrowPath = self.currentDirectory + os.path.sep + 'Images' + os.path.sep + 'arrow.png'
+        self.arrowPath = os.path.sep.join([get_project_root(), 'img_src', 'arrow.png'])
         self.centralGridLayout: QGridLayout
         self.playButton = QPushButton(emoji.emojize(PlayTab.START_GAME_STRING))
         self.countDownModal = QDialog(self)

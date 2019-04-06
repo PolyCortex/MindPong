@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidge
 from PyQt5.QtGui import QIcon
 
 from mindpong.model.game import Game, GameState
+from mindpong.utils import get_project_root
 
 class MainMenu(QMainWindow):
 
@@ -23,7 +24,7 @@ class MainMenu(QMainWindow):
     def __init__(self):
         super().__init__()
         # attributes:
-        self._logoPath = 'img_src'+ os.path.sep + 'Images' + os.path.sep + 'logo_polyCortex.png'
+        self._logoPath = os.path.sep.join([get_project_root(), 'img_src', 'logo_polyCortex.png'])
         self.centralWidget = QWidget()
         self.tabWidget = QTabWidget()
         self.vBoxLayout = QVBoxLayout()
