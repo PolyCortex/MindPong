@@ -12,6 +12,7 @@ from PyQt5.QtGui import QIcon
 
 from mindpong.model.game import Game, GameState
 from mindpong.utils import get_project_root
+from mindpong.view.utils import MINDPONG_TITLE
 
 class MainMenu(QMainWindow):
 
@@ -55,7 +56,7 @@ class MainMenu(QMainWindow):
         self.centralWidget.setLayout(self.vBoxLayout)
         self.resize(MainMenu.DEFAULT_MENU_HEIGHT, MainMenu.DEFAULT_MENU_WIDTH)
         self.center_menu()
-        self.setWindowTitle('MindPong')
+        self.setWindowTitle(MINDPONG_TITLE)
         self.setWindowIcon(QIcon(self._logoPath))
 
     def init_tabs(self):
