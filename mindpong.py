@@ -2,7 +2,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from mindpong.MainMenu import MainMenu
+from mindpong.view.MainMenu import MainMenu
 from mindpong.model.game import Game
 from mindpong.model.serial_communication import SerialCommunication
 from mindpong.delegate.delegate import Delegate
@@ -29,6 +29,12 @@ def main():
     menu.set_delegate(delegate)
     
     menu.show()
+
+    game.start()
+    print(str(serial_communication.get_available_serial_ports()))
+
+    #serial_communication.establish_communication()
+
     sys.exit(app.exec_())
 
 

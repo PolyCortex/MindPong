@@ -3,9 +3,9 @@
 
 import os
 import sys
-from mindpong.PlayTab import PlayTab
-from mindpong.SettingsTab import SettingsTab
-from mindpong.StatsTab import StatsTab
+from mindpong.view.PlayTab import PlayTab
+from mindpong.view.SettingsTab import SettingsTab
+from mindpong.view.StatsTab import StatsTab
 import emoji
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon
