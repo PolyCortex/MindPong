@@ -60,3 +60,4 @@ class PlayTab(QTabWidget):
             print("error in game state \n")
 
     def update_start_game_label(self):
+        pass
