@@ -30,13 +30,13 @@ You will need a few tools to get started with Muse headset and pyMuse:
 
 *  [MuseDirect](http://developer.choosemuse.com/tools/windows-tools) (Windows) or [MuseIO](http://developer.choosemuse.com/tools/mac-tools) (MacOS) or [MuseIO](http://developer.choosemuse.com/tools/linux-tools)(Linux)
 
-*  [Python 2.7](https://www.python.org/downloads/release/python-2714/)
+*  [Python 3.7](https://www.python.org/downloads/release/python-370/)
 
 Don't hesitate to go on [Muse Developer website](http://developer.choosemuse.com/) for additionnal information.
 
 ### Prerequisites
 
-You must have Python 2.7 installed and you must have installed the toolkit from the [Muse Developper website](http://developer.choosemuse.com/tools/windows-tools).
+You must have Python 3.7 installed and you must have installed the toolkit from the [Muse Developper website](http://developer.choosemuse.com/tools/windows-tools).
 
 
 ### Installation of dependencies
@@ -49,11 +49,10 @@ Simply use pip in order to install all of the project's dependencies.
 
 Pip should install all requirements, including:
 
-* pexpect
-
+*  [pyserial](https://github.com/pyserial/pyserial)
+*  [PyQtGraph](http://www.pyqtgraph.org/)
 *  [pyMuse](https://github.com/PolyCortex/pyMuse/) and its own dependencies
-
-*  [PyQt4](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4)
+*  [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro)
   
 
 ## Getting started
