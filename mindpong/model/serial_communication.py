@@ -20,17 +20,25 @@ class SerialCommunication():
         self._serial_channel.port = PORT
         self._serial_channel.baudrate = BAUD_RATE
 
+    @property
+    def baudrate(self):
+        return self._serial_channel.baudrate
 
-    def set_baudrate(self, baudrate):
+    @baudrate.setter
+    def baudrate(self, new_baudrate):
         if not self._serial_channel.is_open:
-            self._serial_channel.baudrate = baudrate
+            self._serial_channel.baudrate = new_baudrate
         else:
             raise Exception("Close connection before changing baudrate")
 
+    @property
+    def port(self):
+        return self._serial_channel.port
 
-    def set_port(self, port):
+    @port.setter
+    def set_port(self, new_port):
         if not self._serial_channel.is_open:
-            self._serial_channel.port = port
+            self._serial_channel.port = new_port
         else:
             raise Exception("Close connection before changing port")
 
@@ -51,12 +59,16 @@ class SerialCommunication():
 
 
     def establish_communication(self):
-        """ Enables the communication with the arduino with the latest parameters """
+        """ 
+        Enables the communication with the arduino with the latest parameters 
+        
+        Throws a SerialException is it cannot connect to port
+        """
         try:
             self._serial_channel.open()
         except SerialException as error:
             print("Error when connecting to serial %s port" % (self._serial_channel.port))
-            raise(error)
+            raise(SerialException)
 
 
     def send_data(self, data):

@@ -6,6 +6,7 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout, QGroupBox, QLabel, QPushButton, QMainWindow, QDialog
 
+from mindpong.model.game import GameState
 
 class StatsTab(QTabWidget):
     P_ONE = 0
@@ -57,16 +58,19 @@ class StatsTab(QTabWidget):
         self.playButton.setStyleSheet("background-color: #00a443")
         self.centralLayout.addWidget(self.playButton, 1, 0, 1, 1)
         self.playButton.clicked.connect(self.click_start_button_callback)
+    
+    def set_delegate(self, delegate):
+        self.delegate = delegate
 
     def click_start_button_callback(self):
-        if self.gameState == 0:
+        if self.delegate and self.delegate.game.state == GameState.INITIAL:
             self.playButton.setText(StatsTab.STOP_GAME_STRING)
             self.playButton.setStyleSheet("background-color: #ff0000")
             self.playerPlotWidget[StatsTab.P_ONE].start_timer()
             self.playerPlotWidget[StatsTab.P_TWO].start_timer()
             self.gameState = 1
 
-        elif self.gameState == 1:
+        elif self.delegate and self.delegate.game.state == GameState.IN_PLAY:
             self.playButton.setText(StatsTab.START_GAME_STRING)
             self.playButton.setStyleSheet("background-color: #00a443")
             self.playerPlotWidget[StatsTab.P_ONE].stop_timer()

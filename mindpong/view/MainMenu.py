@@ -59,12 +59,15 @@ class MainMenu(QMainWindow):
         self.setWindowIcon(QIcon(self._logoPath))
 
     def init_tabs(self):
-        self.tabWidget.addTab(self.statsTab, "📊 Statistics")
         self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
+        self.tabWidget.addTab(self.statsTab, "📊 Statistics")
         self.tabWidget.addTab(self.settingsTab, emoji.emojize(" ⚙ Settings"))
 
     def set_delegate(self, delegate):
         self.delegate = delegate
+        self.playTab.set_delegate(delegate)
+        self.statsTab.set_delegate(delegate)
+        self.settingsTab.set_delegate(delegate)
 
     def closeEvent(self, event):
         self.delegate.end_game()

@@ -23,7 +23,7 @@ class Game():
     """ Represents the game state """
 
     def __init__(self, signals_callback):
-        self.state: GameState = GameState.INITIAL
+        self._state: GameState = GameState.INITIAL
         self.winner = None
         self.callbacks = signals_callback
         self.players = [
@@ -31,24 +31,38 @@ class Game():
             Player(DEFAULT_PORT_PLAYER_TWO, signals_callback)
         ]
 
-    def start(self):
-        if self.state is GameState.INITIAL:
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, new_state):
+        """ sets the state of the game """
+        if new_state == GameState.IN_PLAY and self._state == GameState.INITIAL:
+            self._start()
+            return
+
+        self._state = new_state
+
+
+    def _start(self):
+        if self._state is GameState.INITIAL:
             for player in self.players:
                 player.start()
                 player.is_playing = True
 
             self._update_thread = Thread(target=self._update_signal).start()
-            self.state = GameState.IN_PLAY
+            self._state = GameState.IN_PLAY
 
     def _update_signal(self):
         print("Game started with " + str(len(self.players)) + " players")
         data = [np.nan] * len(self.players)
 
-        while(self.state is GameState.IN_PLAY):
+        while(self._state is GameState.IN_PLAY):
             try:
                 data = self._get_players_data(data)
             except SystemExit:
-                self.state = GameState.INITIAL
+                self._state = GameState.INITIAL
                 break
 
             if self._has_undefined_signal(data):

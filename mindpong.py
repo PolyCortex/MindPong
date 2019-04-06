@@ -30,11 +30,6 @@ def main():
     
     menu.show()
 
-    game.start()
-    print(str(serial_communication.get_available_serial_ports()))
-
-    #serial_communication.establish_communication()
-
     sys.exit(app.exec_())
 
 
