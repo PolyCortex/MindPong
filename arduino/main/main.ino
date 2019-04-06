@@ -50,7 +50,6 @@ void loop() {
 
   waitUntilDataIsAvailable();
   updateFanSpeed();
-  delay(100);
 }
 
 void checkEndGame(Player player) {
