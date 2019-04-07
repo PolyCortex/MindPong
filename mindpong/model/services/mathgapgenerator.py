@@ -25,12 +25,10 @@ class MathGapGenerator():
             for i in range(SINGLE_DIGIT_QTY):
                 equation += str(operands[i]) + ' ' + operators[i] + ' ' if i != SINGLE_DIGIT_QTY - 1 else str(operands[i])
             is_operation_valid = eval(equation) % 1 != 0
-        return equation
+        return (operands, operators)
 
 
 if(__name__ == '__main__'):
     mdg = MathGapGenerator()
-    for _ in range(0, 100000):
-        gen = mdg.generate()
-        print('QST:', gen)
-        print('ANS: ', eval(gen))
+    gen = mdg.generate()
+    print(gen)
