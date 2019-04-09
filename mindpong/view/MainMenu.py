@@ -9,16 +9,15 @@ from mindpong.view.StatsTab import StatsTab
 import emoji
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSignal
 
 from mindpong.model.game import Game, GameState
 from mindpong.utils import get_project_root
 from mindpong.view.utils import MINDPONG_TITLE
 
 class MainMenu(QMainWindow):
+    resized = pyqtSignal()
 
-    # Class attributes/constants
-    Y_COORD_UPPER_BOUND = 1080  # random value based on my screen dimensions
-    X_COORD_UPPER_BOUND = 1920  # random value based on my screen dimensions
     DEFAULT_MENU_HEIGHT = 800
     DEFAULT_MENU_WIDTH = 640
 
@@ -34,6 +33,8 @@ class MainMenu(QMainWindow):
         self.settingsTab = SettingsTab()
         # init methods
         self.init_ui()
+        # init signals
+        self.resized.connect(self.resizeWidgets)
 
     @property
     def current_directory(self):
@@ -43,19 +44,13 @@ class MainMenu(QMainWindow):
     def logo_path(self):
         return self._logoPath
 
-    def center_menu(self):
-        screen = QDesktopWidget().screenGeometry()
-        size = self.geometry()
-        self.move((screen.width() - size.width()) / 2,
-                  (screen.height() - size.height()) / 2)
-
     def init_ui(self):
         self.init_tabs()
         self.vBoxLayout.addWidget(self.tabWidget)
         self.setCentralWidget(self.centralWidget)
         self.centralWidget.setLayout(self.vBoxLayout)
         self.resize(MainMenu.DEFAULT_MENU_HEIGHT, MainMenu.DEFAULT_MENU_WIDTH)
-        self.center_menu()
+        self.showMaximized()
         self.setWindowTitle(MINDPONG_TITLE)
         self.setWindowIcon(QIcon(self._logoPath))
 
@@ -69,6 +64,13 @@ class MainMenu(QMainWindow):
         self.playTab.set_delegate(delegate)
         self.statsTab.set_delegate(delegate)
         self.settingsTab.set_delegate(delegate)
+
+    def resizeWidgets(self):
+        print("allo")
+
+    def resizeEvent(self, event):
+        self.resized.emit()
+        return super(MainMenu, self).resizeEvent(event)
 
     def closeEvent(self, event):
         self.delegate.end_game()

@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
     QTabWidget, QGridLayout, QLabel, 
     QPushButton, QDialog, QMessageBox
 )
+from PyQt5.QtCore import Qt
 import emoji
 from serial import SerialException
 
@@ -20,6 +21,9 @@ class PlayTab(QTabWidget):
 
     START_GAME_STRING = "▶️ Start"
     STOP_GAME_STRING = "⏹️ Stop"
+
+    ARROW_SCALE_DIVIDER = (1, 1)
+    BALL_SCALE_DIVIDER = (3, 3)
 
     def __init__(self):
         super().__init__()
@@ -41,7 +45,8 @@ class PlayTab(QTabWidget):
         self.centralGridLayout = QGridLayout()
         self.setLayout(self.centralGridLayout)
         self.set_players_labels()
-        self.set_ball_label()
+        self.arrow_label = self.set_picture_label(self.arrowPath, ((0, 3, 1, 1)), self.ARROW_SCALE_DIVIDER)
+        self.ball_label = self.set_picture_label(self.ballPath, (0, 2, 1, 1), self.BALL_SCALE_DIVIDER)
         self.centralGridLayout.addWidget(QLabel("Math Question: "), 1, 0, 1, 2)
         self.centralGridLayout.addWidget(self.playButton, 2, 1, 1, 3)
 
@@ -50,15 +55,19 @@ class PlayTab(QTabWidget):
         for player in players:
             player.setFont(QFont("Times", 16, QFont.Bold))
             player.setMargin(30)
+            player.setAlignment(Qt.AlignCenter)
         self.centralGridLayout.addWidget(players[0], 0, 0)
-        self.centralGridLayout.addWidget(players[1], 0, 5)
+        self.centralGridLayout.addWidget(players[1], 0, 6)
 
-    def set_ball_label(self):
-        ballLabel = QLabel()
-        ballPixMap = QPixmap(self.ballPath)
-        ballLabel.setPixmap(ballPixMap)
-        ballLabel.resize(ballPixMap.width(), ballPixMap.height())
-        self.centralGridLayout.addWidget(ballLabel, 0, 2, 1, 1)
+    def set_picture_label(self, path, positions, scale_divider):
+        label = QLabel()
+        label.setAlignment(Qt.AlignCenter)
+        pixmap = QPixmap(path)
+        
+        label.setPixmap(pixmap.scaled(pixmap.width()/scale_divider[0], pixmap.height()/scale_divider[1], Qt.KeepAspectRatio))
+        label.setFixedWidth(pixmap.width()/scale_divider[0])
+        self.centralGridLayout.addWidget(label, positions[0], positions[1], positions[2], positions[3])
+        return label
 
     def init_buttons(self):
         self.playButton.setStyleSheet(BACKGROUND_COLORS['GREEN'])
@@ -94,7 +103,3 @@ class PlayTab(QTabWidget):
 
         self.playButton.setText(PlayTab.STOP_GAME_STRING)
         self.playButton.setStyleSheet(BACKGROUND_COLORS["RED"])
-
-
-    def update_start_game_label(self):
-        pass
