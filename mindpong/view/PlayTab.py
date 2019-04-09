@@ -22,8 +22,8 @@ class PlayTab(QTabWidget):
     START_GAME_STRING = "▶️ Start"
     STOP_GAME_STRING = "⏹️ Stop"
 
-    ARROW_SCALE_DIVIDER = (1, 1)
-    BALL_SCALE_DIVIDER = (3, 3)
+    ARROW_SCALE = (1, 1)
+    BALL_SCALE = (1/3, 1/3)
 
     def __init__(self):
         super().__init__()
@@ -45,8 +45,8 @@ class PlayTab(QTabWidget):
         self.centralGridLayout = QGridLayout()
         self.setLayout(self.centralGridLayout)
         self.set_players_labels()
-        self.arrow_label = self.set_picture_label(self.arrowPath, ((0, 3, 1, 1)), self.ARROW_SCALE_DIVIDER)
-        self.ball_label = self.set_picture_label(self.ballPath, (0, 2, 1, 1), self.BALL_SCALE_DIVIDER)
+        self.arrow_label = self.set_picture_label(self.arrowPath, ((0, 3, 1, 1)), self.ARROW_SCALE)
+        self.ball_label = self.set_picture_label(self.ballPath, (0, 2, 1, 1), self.BALL_SCALE)
         self.centralGridLayout.addWidget(QLabel("Math Question: "), 1, 0, 1, 2)
         self.centralGridLayout.addWidget(self.playButton, 2, 1, 1, 3)
 
@@ -59,13 +59,13 @@ class PlayTab(QTabWidget):
         self.centralGridLayout.addWidget(players[0], 0, 0)
         self.centralGridLayout.addWidget(players[1], 0, 6)
 
-    def set_picture_label(self, path, positions, scale_divider):
+    def set_picture_label(self, path, positions, scale):
         label = QLabel()
         label.setAlignment(Qt.AlignCenter)
         pixmap = QPixmap(path)
         
-        label.setPixmap(pixmap.scaled(pixmap.width()/scale_divider[0], pixmap.height()/scale_divider[1], Qt.KeepAspectRatio))
-        label.setFixedWidth(pixmap.width()/scale_divider[0])
+        label.setPixmap(pixmap.scaled(pixmap.width() * scale[0], pixmap.height() * scale[1], Qt.KeepAspectRatio))
+        label.setFixedWidth(pixmap.width() * scale[0])
         self.centralGridLayout.addWidget(label, positions[0], positions[1], positions[2], positions[3])
         return label
 
@@ -92,6 +92,11 @@ class PlayTab(QTabWidget):
 
         else:
             print("error in game state \n")
+
+    def resizeEvent(self, event):
+        # TODO: adjust labels to fit the screen correctly
+        # https://www.riverbankcomputing.com/static/Docs/PyQt4/qresizeevent.html
+        return super(PlayTab, self).resizeEvent(event)
 
     def start_game(self):
         try:
