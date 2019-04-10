@@ -10,9 +10,11 @@ class Delegate():
         self.serial_communication: SerialCommunication = serial_communication
 
     def start_game(self):
-        self.serial_communication.establish_communication()
         self.game.state = GameState.IN_PLAY
+        self.serial_communication.establish_communication()
+        self.game.begin()
 
     def end_game(self):
         self.game.state = GameState.INITIAL
         self.serial_communication.close_communication()
+        self.game.end()

@@ -154,7 +154,7 @@ class PlayTab(QTabWidget):
 
     def _start_game(self):
         try:
-            self.delegate._start_game()
+            self.delegate.start_game()
         except SerialException as e:
             self.errorBox.setText("Error: can't connect to serial %s port" % (self.delegate.serial_communication.port))
             self.errorBox.show()

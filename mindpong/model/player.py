@@ -17,7 +17,7 @@ class PlayerName(Enum):
 class Player(object):
     """ defines the properties of a player """
 
-    def __init__(self, player_name: PlayerName, port, signal_callbacks, ip_address=DEFAULT_IP_ADDRESS):
+    def __init__(self, player_name: PlayerName, signal_callbacks, port, ip_address=DEFAULT_IP_ADDRESS):
         if not isinstance(player_name, PlayerName):
             raise TypeError(
                 'player_name parameter must be of type enum PlayerName')
@@ -64,8 +64,8 @@ class Player(object):
         self.signals.shutdown()
         self.eeg_pipeline.shutdown()
 
-    def _configure_pipeline(self, game_number):
+    def _configure_pipeline(self, game_name):
         self._signals = MuseOSCInputStream(
             SIGNAL_NAMES, self._ip_address, self._port)
-        self.eeg_pipeline = Pipeline(self.signals.get_signal('eeg'), MuseCSVOutputStream(
-            'History/Game#%i/%s'%(game_number,self._player_name)))
+        self.eeg_pipeline = Pipeline(self.signals.get_signal('eeg'),
+                                     MuseCSVOutputStream('History/%s/%s' % (game_name, self._player_name.value[0])))

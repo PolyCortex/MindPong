@@ -2,6 +2,7 @@ from threading import Thread
 import sys
 
 from pymuse.signal import SignalData
+from datetime import datetime
 import numpy as np
 from enum import Enum
 from queue import Empty
@@ -27,9 +28,10 @@ class Game():
         self.winner = None
         self.callbacks = signals_callback
         self.players = [
-            Player(PlayerName.PLAYER_ONE, DEFAULT_PORT_PLAYER_ONE, signals_callback),
-            Player(PlayerName.PLAYER_TWO, DEFAULT_PORT_PLAYER_TWO, signals_callback)
+            Player(PlayerName.PLAYER_ONE, signals_callback, DEFAULT_PORT_PLAYER_ONE),
+            Player(PlayerName.PLAYER_TWO, signals_callback, DEFAULT_PORT_PLAYER_TWO)
         ]
+        self._game_counter = 0
 
     @property
     def state(self):
@@ -38,22 +40,20 @@ class Game():
     @state.setter
     def state(self, new_state):
         """ sets the state of the game """
-        if new_state == GameState.IN_PLAY and self._state == GameState.INITIAL:
-            self._start()
-            return
-
         self._state = new_state
 
 
-    def _start(self):
-        if self._state is GameState.INITIAL:
-            for player in self.players:
-                player.start(1)
-                player.is_playing = True
+    def begin(self):
+        for player in self.players:
+            player.start("Game #%i - %s"%(self._game_counter, datetime.now().strftime("%Y-%m-%d-%H_%M_%S")))
+            player.is_playing = True
+        self._update_thread = Thread(target=self._update_signal)
+        self._update_thread.start()
 
-            self._update_thread = Thread(target=self._update_signal)
-            self._update_thread.start()
-            self._state = GameState.IN_PLAY
+    def end(self):
+        for player in self.players:
+            player.stop()
+        self._game_counter += 1
 
     def _update_signal(self):
         print("Game started with " + str(len(self.players)) + " players")
