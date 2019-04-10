@@ -63,21 +63,29 @@ class PlayTab(QTabWidget):
         players = [QLabel("Player one"), QLabel("Player two")]
         for player in players:
             player.setFont(QFont("Times", 18, QFont.Bold))
-            player.setMargin(30)
+            player.setMargin(70)
             player.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
         self.centralGridLayout.addWidget(players[0], 0, 0, 1, 2)
         self.centralGridLayout.addWidget(players[1], 0, 5, 1, 2)
 
     def set_pixmap_labels(self):
-        # arrow pixmaps
-        self.arrow_labels = []
-        arrow_player_one = self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[0], (Qt.AlignLeft | Qt.AlignVCenter))
-        self.arrow_labels.append(arrow_player_one) 
-        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 4, 1, 1)
+        # player logos
+        self.player_logo_labels = [
+            self.get_picture_label(get_image_file(RED_PLAYER_FILE_NAME), (0.35, 0.35), (Qt.AlignCenter)),
+            self.get_picture_label(get_image_file(BLUE_PLAYER_FILE_NAME), (0.35, 0.35), (Qt.AlignCenter))
+        ]
+        self.centralGridLayout.addWidget(self.player_logo_labels[0], 0, 0, 1, 2)
+        self.centralGridLayout.addWidget(self.player_logo_labels[1], 0, 5, 1, 2)
 
-        arrow_player_two = self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[1], (Qt.AlignRight | Qt.AlignVCenter))
-        self.arrow_labels.append(arrow_player_two) 
-        self.centralGridLayout.addWidget(self.mirror_player_arrow(self.arrow_labels[1]), 0, 2, 1, 1)
+        # arrow pixmaps
+        self.arrow_labels = [
+            self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[0], (Qt.AlignLeft | Qt.AlignVCenter)),
+            self.mirror_player_arrow(
+                self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[1], (Qt.AlignRight | Qt.AlignVCenter))
+            )
+        ]
+        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 4, 1, 1)
+        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 2, 1, 1)
 
         # ball pixmaps
         self.ball_label = self.get_picture_label(get_image_file(PINGPONG_FILE_NAME), self.BALL_SCALE, Qt.AlignCenter)
