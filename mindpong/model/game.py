@@ -6,7 +6,7 @@ import numpy as np
 from enum import Enum
 from queue import Empty
 
-from mindpong.model.player import Player, SIGNAL_NAMES
+from mindpong.model.player import Player, SIGNAL_NAMES, PlayerName
 
 DEFAULT_PORT_PLAYER_ONE = 5001
 DEFAULT_PORT_PLAYER_TWO = 5002
@@ -27,8 +27,8 @@ class Game():
         self.winner = None
         self.callbacks = signals_callback
         self.players = [
-            Player(DEFAULT_PORT_PLAYER_ONE, signals_callback),
-            Player(DEFAULT_PORT_PLAYER_TWO, signals_callback)
+            Player(PlayerName.PLAYER_ONE, DEFAULT_PORT_PLAYER_ONE, signals_callback),
+            Player(PlayerName.PLAYER_TWO, DEFAULT_PORT_PLAYER_TWO, signals_callback)
         ]
 
     @property
@@ -48,10 +48,11 @@ class Game():
     def _start(self):
         if self._state is GameState.INITIAL:
             for player in self.players:
-                player.start()
+                player.start(1)
                 player.is_playing = True
 
-            self._update_thread = Thread(target=self._update_signal).start()
+            self._update_thread = Thread(target=self._update_signal)
+            self._update_thread.start()
             self._state = GameState.IN_PLAY
 
     def _update_signal(self):
