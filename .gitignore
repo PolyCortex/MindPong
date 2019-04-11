@@ -112,3 +112,6 @@ dmypy.json
 # ide preferences folder
 .vscode/
 .idea/
+
+# Saved Games
+History/
