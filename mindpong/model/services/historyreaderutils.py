@@ -15,10 +15,13 @@ def read_player_signal(game_name: str, player_name: PlayerName):
     file_path = Path('History/%s/%s' %
                      (game_name, player_name.value[0])).with_suffix('.csv')
     signals = [[] for _ in range(6)]
+    headers = []
     with open(file_path, 'r', newline='') as csvfile:
         reader = csv.reader(csvfile)
         for i, row in enumerate(list(reader)):
             if i is not 0:
                 for j in range(1, len(row)):
                     signals[j-1].append(row[j])
-    return signals
+            else:
+                headers = row[1:-1]
+    return {headers[i]: signals[i] for i in range(len(headers))}
