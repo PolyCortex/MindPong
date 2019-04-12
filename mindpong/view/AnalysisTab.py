@@ -21,20 +21,26 @@ from mindpong.model.services.historyreaderutils import read_player_signal, get_a
 from mindpong.model.player import PlayerName
 from pymuse.inputstream.muse_constants import MUSE_EEG_ACQUISITION_FREQUENCY
 
+NO_AVAILABLE_GAMES = 'No Available Game for Analysis'
 
 class AnalysisTab(QTabWidget):
 
     def __init__(self):
         super().__init__()
+        self.game_list = None
         self.game_selector = None
         self.centralLayout = None
+        self.spectrograms_layout = None
+        self.spectrogram_widgets = []
         self.init_ui()
 
     def init_ui(self):
         self.centralLayout = QVBoxLayout()
         self.game_selector = self.create_game_selector()
         self.populate_game_selector()
-        self.create_spectrograms('Game #0 - 2019-04-10-15_46_33')
+        if len(self.game_list):
+            self.spectrograms_layout = self.create_spectrograms_layout(self.game_selector.currentText())
+            self.centralLayout.addLayout(self.spectrograms_layout)
         self.setLayout(self.centralLayout)
 
     def create_game_selector(self):
@@ -46,6 +52,7 @@ class AnalysisTab(QTabWidget):
         self.centralLayout.addWidget(game_selector)
         self.centralLayout.setAlignment(
             game_selector, Qt.AlignTop | Qt.AlignHCenter)
+        game_selector.currentTextChanged.connect(self.on_game_selector_change)
         return game_selector
 
     def populate_game_selector(self):
@@ -55,24 +62,25 @@ class AnalysisTab(QTabWidget):
             self.game_selector.addItems(self.game_list)
         else:
             line_edit = QLineEdit()
-            line_edit.setPlaceholderText('No Available Game for Analysis')
+            line_edit.setPlaceholderText(NO_AVAILABLE_GAMES)
             line_edit.setReadOnly(True)
             self.game_selector.setLineEdit(line_edit)
         self.game_selector.update()
     
-    def create_spectrograms(self, game_name: str):
+    def create_spectrograms_layout(self, game_name: str):
         ELECTRODES_NUMBER = 4
         setConfigOptions(imageAxisOrder='row-major')
         spectrograms_layout = QGridLayout()
         for i, player_name in enumerate(PlayerName):
             for j in range(ELECTRODES_NUMBER):
-                spectrograms_layout.addWidget(self.create_spectrogram(game_name, player_name, 'electrode %i'%j), j, i)
-        self.centralLayout.addLayout(spectrograms_layout)
+                spectrogram_widget = GraphicsLayoutWidget()
+                self.spectrogram_widgets.append((spectrogram_widget, player_name, j))
+                spectrograms_layout.addWidget(spectrogram_widget, j, i)
+        return spectrograms_layout
 
-    def create_spectrogram(self, game_name: str, player_name: PlayerName, electrode_name: str):
+    def add_spectrogram_to_widget(self, widget: GraphicsLayoutWidget, game_name: str, player_name: PlayerName, electrode_name: str):
         # https://stackoverflow.com/questions/51312923/plotting-the-spectrum-of-a-wavfile-in-pyqtgraph-using-scipy-signal-spectrogram
         f, t, Sxx = self._acquire_spectrogram_signal(game_name, player_name, electrode_name)
-        widget = GraphicsLayoutWidget()
         plot = widget.addPlot()
         img = ImageItem()
         plot.addItem(img)
@@ -91,10 +99,16 @@ class AnalysisTab(QTabWidget):
         plot.setLimits(xMin=0, xMax=t[-1], yMin=0, yMax=f[-1])
         plot.setLabel('bottom', "Time", units='s')
         plot.setLabel('left', "Frequency", units='Hz')
-        return widget
 
     def set_delegate(self, delegate):
         self.delegate = delegate
+
+    def on_game_selector_change(self, selected_game):
+        if len(selected_game) and self.spectrogram_widgets is not None:
+            for spectrogram_widget in self.spectrogram_widgets:
+                spectrogram_widget[0].clear()
+                self.add_spectrogram_to_widget(spectrogram_widget[0], selected_game, spectrogram_widget[1], "electrode %i"%spectrogram_widget[2])
+            self.centralLayout.update()
 
     def _acquire_spectrogram_signal(self, game_name: str, player_name: PlayerName, electrode_name: str):
         eeg_signal = read_player_signal(game_name, player_name)
