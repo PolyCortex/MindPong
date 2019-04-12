@@ -1,11 +1,11 @@
 import os
 
-from PyQt5.QtGui import (QFont, QPixmap, QTransform, QPainter)
+from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import (
     QTabWidget, QGridLayout, QLabel, 
     QPushButton, QDialog, QMessageBox, QStyleFactory
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QRect
+from PyQt5.QtCore import Qt, pyqtSignal
 import emoji
 from serial import SerialException
 
@@ -28,7 +28,6 @@ class PlayTab(QTabWidget):
     STOP_GAME_STRING = "⏹️ Stop"
 
     # (width_scale, height_scale)
-    ARROW_SCALES = [(0.75, 0.75), (0.75, 0.75)] 
     BALL_SCALE = (0.25, 0.25)
 
     def __init__(self):
@@ -82,9 +81,8 @@ class PlayTab(QTabWidget):
 
         # arrow pixmaps
         self.arrow_labels = [ScalableArrow(is_mirrored=True), ScalableArrow()]
-
-        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 2, 1, 1, (Qt.AlignRight | Qt.AlignVCenter))
-        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 4, 1, 1, (Qt.AlignLeft | Qt.AlignVCenter))
+        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 2, 1, 1, (Qt.AlignVCenter))
+        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 4, 1, 1, (Qt.AlignVCenter))
 
         # ball pixmaps
         self.ball_label = self.get_picture_label(get_image_file(PINGPONG_FILE_NAME), self.BALL_SCALE, Qt.AlignCenter)
@@ -94,11 +92,8 @@ class PlayTab(QTabWidget):
     def get_picture_label(self, path, scale, alignment):
         label = QLabel()
         label.setAlignment(alignment)
-        label.setPixmap(self._update_pixmap_scale(QPixmap(path), scale))
-        return label
-
-    def mirror_player_arrow(self, label):
-        label.setPixmap(label.pixmap().transformed(QTransform().scale(-1,1)))
+        pixmap = QPixmap(path)
+        label.setPixmap(pixmap.scaled(pixmap.width() * scale[0], pixmap.height() * scale[1]))
         return label
         
     def init_buttons(self):
@@ -118,21 +113,18 @@ class PlayTab(QTabWidget):
     def set_delegate(self, delegate):
         self.delegate = delegate
 
-    def _update_pixmap_scale(self, pixmap, scale):
-        return pixmap.scaled(int(pixmap.width() * scale[0]), int(pixmap.height() * scale[1]), Qt.KeepAspectRatio, Qt.FastTransformation)
-
     def _update_signal(self, signal):
         # player 1 signal means - player 2 signal means
         signal_difference = signal[0][1] - signal[1][1]
-
-        new_width_scale = min(abs(signal_difference*10), 1)
         
         if signal_difference > 0: # player 1 is winning
-            self.ARROW_SCALES[0] = (new_width_scale, self.ARROW_SCALES[0][1])
-
+            self.arrow_labels[0].setVisible(True)
+            self.arrow_labels[1].setVisible(False)
+            self.arrow_labels[0].setWidth(abs(signal_difference))
         elif signal_difference < 0: # player 2 is winning
-            self.ARROW_SCALES[1] = (new_width_scale, self.ARROW_SCALES[1][1])
-        self.update()
+            self.arrow_labels[0].setVisible(False)
+            self.arrow_labels[1].setVisible(True)
+            self.arrow_labels[1].setWidth(abs(signal_difference))
 
 
 
