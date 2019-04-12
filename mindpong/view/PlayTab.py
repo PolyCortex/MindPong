@@ -85,7 +85,8 @@ class PlayTab(QTabWidget):
         self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 4, 1, 1, (Qt.AlignVCenter))
 
         # mathquestions widget
-        self.centralGridLayout.addWidget(MathQuestions(), 1, 1, 1, 5, (Qt.AlignVCenter))
+        self.math_question_widget = MathQuestions()
+        self.centralGridLayout.addWidget(self.math_question_widget, 1, 1, 1, 5, (Qt.AlignVCenter))
 
         # ball pixmaps
         self.ball_label = self.get_picture_label(get_image_file(PINGPONG_FILE_NAME), self.BALL_SCALE, Qt.AlignCenter)
@@ -115,6 +116,7 @@ class PlayTab(QTabWidget):
 
     def set_delegate(self, delegate):
         self.delegate = delegate
+        self.math_question_widget.set_delegate(delegate)
 
     def _update_signal(self, signal):
         # player 1 signal means - player 2 signal means

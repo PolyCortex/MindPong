@@ -8,6 +8,7 @@ from enum import Enum
 from queue import Empty
 
 from mindpong.model.player import Player, SIGNAL_NAMES, PlayerName
+from mindpong.model.mathexercise import MathExercise
 
 DEFAULT_PORT_PLAYER_ONE = 5001
 DEFAULT_PORT_PLAYER_TWO = 5002
@@ -31,6 +32,7 @@ class Game():
             Player(PlayerName.PLAYER_ONE, signals_callback, DEFAULT_PORT_PLAYER_ONE),
             Player(PlayerName.PLAYER_TWO, signals_callback, DEFAULT_PORT_PLAYER_TWO)
         ]
+        self.math_exercices = MathExercise()
         self._game_counter = 0
 
     @property
