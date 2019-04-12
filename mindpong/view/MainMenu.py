@@ -5,7 +5,7 @@ import os
 import sys
 from mindpong.view.PlayTab import PlayTab
 from mindpong.view.SettingsTab import SettingsTab
-from mindpong.view.StatsTab import StatsTab
+from mindpong.view.AnalysisTab import AnalysisTab
 import emoji
 from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon
@@ -27,7 +27,7 @@ class MainMenu(QMainWindow):
         self.centralWidget = QWidget()
         self.tabWidget = QTabWidget()
         self.vBoxLayout = QVBoxLayout()
-        self.statsTab = StatsTab()
+        self.analysisTab = AnalysisTab()
         self.playTab = PlayTab()
         self.settingsTab = SettingsTab()
         # init methods
@@ -53,13 +53,13 @@ class MainMenu(QMainWindow):
 
     def init_tabs(self):
         self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
-        self.tabWidget.addTab(self.statsTab, "📊 Statistics")
+        self.tabWidget.addTab(self.analysisTab, "📊 Analysis")
         self.tabWidget.addTab(self.settingsTab, emoji.emojize(" ⚙ Settings"))
 
     def set_delegate(self, delegate):
         self.delegate = delegate
         self.playTab.set_delegate(delegate)
-        self.statsTab.set_delegate(delegate)
+        self.analysisTab.set_delegate(delegate)
         self.settingsTab.set_delegate(delegate)
 
     def closeEvent(self, event):
