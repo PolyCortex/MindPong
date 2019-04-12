@@ -13,9 +13,9 @@ from serial import SerialException
 from mindpong.view.utils import (
     BACKGROUND_COLORS, IMAGES_PATH, MINDPONG_TITLE,
     get_image_file)
+from mindpong.view.widgets.scalablearrow import ScalableArrow
 from mindpong.model.game import GameState
 
-ARROW_FILE_NAME = 'arrow.png'
 PINGPONG_FILE_NAME = 'ball.png'
 RED_PLAYER_FILE_NAME = 'red_player.png'
 BLUE_PLAYER_FILE_NAME = 'blue_player.png'
@@ -81,18 +81,10 @@ class PlayTab(QTabWidget):
         self.centralGridLayout.addWidget(self.player_logo_labels[1], 0, 5, 1, 2)
 
         # arrow pixmaps
-        self.arrow_labels = [
-            self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[0], (Qt.AlignLeft | Qt.AlignVCenter)),
-            self.mirror_player_arrow(
-                self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[1], (Qt.AlignRight | Qt.AlignVCenter))
-            )
-        ]
-        for arrow_label in self.arrow_labels:
-            arrow_label.setVisible(True)
-        self.initial_arrow_pixmap = [arrow.pixmap() for arrow in self.arrow_labels]
+        self.arrow_labels = [ScalableArrow(is_mirrored=True), ScalableArrow()]
 
-        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 4, 1, 1)
-        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 2, 1, 1)
+        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 2, 1, 1, (Qt.AlignRight | Qt.AlignVCenter))
+        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 4, 1, 1, (Qt.AlignLeft | Qt.AlignVCenter))
 
         # ball pixmaps
         self.ball_label = self.get_picture_label(get_image_file(PINGPONG_FILE_NAME), self.BALL_SCALE, Qt.AlignCenter)
@@ -135,17 +127,11 @@ class PlayTab(QTabWidget):
 
         new_width_scale = min(abs(signal_difference*10), 1)
         
-
         if signal_difference > 0: # player 1 is winning
             self.ARROW_SCALES[0] = (new_width_scale, self.ARROW_SCALES[0][1])
-            #self.arrow_labels[0].setVisible(True)
-            #self.arrow_labels[1].setVisible(False)
-            #self.arrow_labels[0].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[0], self.ARROW_SCALES[0]))
+
         elif signal_difference < 0: # player 2 is winning
             self.ARROW_SCALES[1] = (new_width_scale, self.ARROW_SCALES[1][1])
-            #self.arrow_labels[0].setVisible(False)
-            #self.arrow_labels[1].setVisible(True)
-            #self.arrow_labels[1].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[1], self.ARROW_SCALES[1]))
         self.update()
 
 
@@ -173,14 +159,7 @@ class PlayTab(QTabWidget):
         self.playButton.setText(PlayTab.STOP_GAME_STRING)
         self.playButton.setStyleSheet(BACKGROUND_COLORS["RED"])
 
-    def paintEvent(self, event):
-        painter = QPainter()
-        painter.begin(self)
-        pixmap = self.initial_arrow_pixmap[1]
-        dest_dimensions = (self.counter * pixmap.width(), self.counter * pixmap.height())
-        painter.drawPixmap(0,0, dest_dimensions[0], dest_dimensions[1], pixmap.scaled(dest_dimensions[0], dest_dimensions[1], transformMode=Qt.SmoothTransformation))
-        painter.end()
-        self.counter -= 0.01
+
 
     def resizeEvent(self, event):
         # TODO: adjust labels to fit the screen correctly
