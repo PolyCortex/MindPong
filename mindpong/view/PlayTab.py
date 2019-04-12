@@ -87,6 +87,7 @@ class PlayTab(QTabWidget):
         ]
         for arrow_label in self.arrow_labels:
             arrow_label.setVisible(True)
+        self.initial_arrow_pixmap = [arrow.pixmap() for arrow in self.arrow_labels]
 
         self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 4, 1, 1)
         self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 2, 1, 1)
@@ -99,8 +100,7 @@ class PlayTab(QTabWidget):
     def get_picture_label(self, path, scale, alignment):
         label = QLabel()
         label.setAlignment(alignment)
-        label.setPixmap(QPixmap(path))
-        self._update_pixmap_scale(label, scale)        
+        label.setPixmap(self._update_pixmap_scale(QPixmap(path), scale))
         return label
 
     def mirror_player_arrow(self, label):
@@ -124,9 +124,8 @@ class PlayTab(QTabWidget):
     def set_delegate(self, delegate):
         self.delegate = delegate
 
-    def _update_pixmap_scale(self, label, scale):
-        pixmap: QPixmap = label.pixmap()
-        label.setPixmap(pixmap.scaled(int(pixmap.width() * scale[0]), int(pixmap.height() * scale[1]), Qt.KeepAspectRatio))
+    def _update_pixmap_scale(self, pixmap, scale):
+        return pixmap.scaled(int(pixmap.width() * scale[0]), int(pixmap.height() * scale[1]), Qt.KeepAspectRatio, Qt.FastTransformation)
 
     def _update_signal(self, signal):
         # player 1 signal means - player 2 signal means
@@ -136,14 +135,14 @@ class PlayTab(QTabWidget):
 
         if signal_difference > 0: # player 1 is winning
             self.ARROW_SCALES[0] = (new_width_scale, self.ARROW_SCALES[0][1])
-            #self.arrow_labels[0].setVisible(True)
-            #self.arrow_labels[1].setVisible(False)
-            #self.arrow_labels[0].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[0], self.ARROW_SCALES[0]))
+            self.arrow_labels[0].setVisible(True)
+            self.arrow_labels[1].setVisible(False)
+            self.arrow_labels[0].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[0], self.ARROW_SCALES[0]))
         elif signal_difference < 0: # player 2 is winning
             self.ARROW_SCALES[1] = (new_width_scale, self.ARROW_SCALES[1][1])
-            #self.arrow_labels[0].setVisible(False)
-            #self.arrow_labels[1].setVisible(True)
-            #self.arrow_labels[1].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[1], self.ARROW_SCALES[1]))
+            self.arrow_labels[0].setVisible(False)
+            self.arrow_labels[1].setVisible(True)
+            self.arrow_labels[1].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[1], self.ARROW_SCALES[1]))
 
 
 

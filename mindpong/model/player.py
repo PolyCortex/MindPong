@@ -6,7 +6,7 @@ from pymuse.signal import SignalData
 from enum import Enum
 
 DEFAULT_IP_ADDRESS = "127.0.0.1"
-SIGNAL_NAMES = ['eeg', 'beta_relative']
+SIGNAL_NAMES = ['beta_relative', 'eeg']
 
 
 class PlayerName(Enum):
