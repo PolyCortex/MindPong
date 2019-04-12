@@ -1,11 +1,11 @@
 import os
 
-from PyQt5.QtGui import (QFont, QPixmap, QTransform)
+from PyQt5.QtGui import (QFont, QPixmap, QTransform, QPainter)
 from PyQt5.QtWidgets import (
     QTabWidget, QGridLayout, QLabel, 
     QPushButton, QDialog, QMessageBox, QStyleFactory
 )
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QRect
 import emoji
 from serial import SerialException
 
@@ -40,6 +40,8 @@ class PlayTab(QTabWidget):
         self.playButton = QPushButton(emoji.emojize(PlayTab.START_GAME_STRING))
         self.countDownModal = QDialog(self)
         self.init_ui()
+
+        self.counter = 0.75
 
     def init_ui(self):
         self.init_labels_layout()
@@ -132,17 +134,19 @@ class PlayTab(QTabWidget):
         signal_difference = signal[0][1] - signal[1][1]
 
         new_width_scale = min(abs(signal_difference*10), 1)
+        
 
         if signal_difference > 0: # player 1 is winning
             self.ARROW_SCALES[0] = (new_width_scale, self.ARROW_SCALES[0][1])
-            self.arrow_labels[0].setVisible(True)
-            self.arrow_labels[1].setVisible(False)
-            self.arrow_labels[0].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[0], self.ARROW_SCALES[0]))
+            #self.arrow_labels[0].setVisible(True)
+            #self.arrow_labels[1].setVisible(False)
+            #self.arrow_labels[0].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[0], self.ARROW_SCALES[0]))
         elif signal_difference < 0: # player 2 is winning
             self.ARROW_SCALES[1] = (new_width_scale, self.ARROW_SCALES[1][1])
-            self.arrow_labels[0].setVisible(False)
-            self.arrow_labels[1].setVisible(True)
-            self.arrow_labels[1].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[1], self.ARROW_SCALES[1]))
+            #self.arrow_labels[0].setVisible(False)
+            #self.arrow_labels[1].setVisible(True)
+            #self.arrow_labels[1].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[1], self.ARROW_SCALES[1]))
+        self.update()
 
 
 
@@ -168,6 +172,15 @@ class PlayTab(QTabWidget):
 
         self.playButton.setText(PlayTab.STOP_GAME_STRING)
         self.playButton.setStyleSheet(BACKGROUND_COLORS["RED"])
+
+    def paintEvent(self, event):
+        painter = QPainter()
+        painter.begin(self)
+        pixmap = self.initial_arrow_pixmap[1]
+        dest_dimensions = (self.counter * pixmap.width(), self.counter * pixmap.height())
+        painter.drawPixmap(0,0, dest_dimensions[0], dest_dimensions[1], pixmap.scaled(dest_dimensions[0], dest_dimensions[1], transformMode=Qt.SmoothTransformation))
+        painter.end()
+        self.counter -= 0.01
 
     def resizeEvent(self, event):
         # TODO: adjust labels to fit the screen correctly
