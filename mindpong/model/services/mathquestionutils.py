@@ -3,7 +3,8 @@ from random import randint
 
 OPERATORS = ['+', '-', '*', '/']
 OPERANDS_GAP_QTY = 4
-
+MAX_GAP_ANSWER = 99999
+MIN_GAP_ANSWER = 0
 
 class MathQuestionDifficulty(Enum):
     EASY = 'EASY',
@@ -31,7 +32,7 @@ def generate_gap_question(difficulty: MathQuestionDifficulty):
             equation += str(operands[i]) + ' ' + operators[i] + \
                 ' ' if i != OPERANDS_GAP_QTY - 1 else str(operands[i])
         answer = eval(equation)
-        is_operation_valid = answer % 1 == 0
+        is_operation_valid = answer % 1 == 0 and MIN_GAP_ANSWER < answer < MAX_GAP_ANSWER
     return {"operands": operands, "operators": operators, "answer": answer}
 
 def generate_drill_question(difficulty: MathQuestionDifficulty, term_number: TermNumber):

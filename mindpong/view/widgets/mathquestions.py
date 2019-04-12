@@ -43,23 +43,12 @@ class MathQuestions(QWidget):
     def _set_configuration_panel(self):
         self.config_panel_layout = QVBoxLayout()
 
-        # Math mode combo box
-
-        #option.setMaximumWidth(option.width() * 0.3)
-        #option.setStyleSheet("padding: 10px 0px; margin: 30px 50px 0px 0px;")
-
-        # Difficulty combo box
-
-        #option.setMaximumWidth(option.width() * 0.3)
-        #option.setStyleSheet("padding: 10px 0px; margin: 30px 50px 0px 0px;")
-
-        # Answer and next question button
+        # Add check answer button
         self.check_answer_button = QPushButton(self.CHECK_ANSWER_BUTTON_TITLE)
         self.check_answer_button.setMaximumWidth(self.check_answer_button.width() * 0.3)
         self.check_answer_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
+        self.check_answer_button.clicked.connect(self._on_click_answer_button)
 
-        #self.config_panel_layout.addWidget(options[0])
-        #self.config_panel_layout.addWidget(options[1])
         self.config_panel_layout.addSpacing(80)
         self.config_panel_layout.addWidget(self.check_answer_button)
         self.grid.addLayout(self.config_panel_layout, 0, 1, 2, 1, (Qt.AlignVCenter))
@@ -72,9 +61,24 @@ class MathQuestions(QWidget):
         self._exercice_model = self.delegate.game.math_exercices
         self._math_question.setText(self._exercice_model.get_question())
         self._equation_label.setText(self._exercice_model.get_equation())
+
+    def _on_click_answer_button(self, event):
+        if self._exercice_model.has_shown_answer:
+            # show new exercice
+            self._exercice_model.update_question()
+            self._equation_label.setText(self._exercice_model.get_equation())
+            self.check_answer_button.setText(self.CHECK_ANSWER_BUTTON_TITLE)
+            self._exercice_model.has_shown_answer = False
+        else: 
+            # show answer
+            self._equation_label.setText(self._exercice_model.get_answer())
+            self.check_answer_button.setText(self.NEXT_QUESTION_BUTTON_TITLE)
+            self._exercice_model.has_shown_answer = True
+            
     
     def sizeHint(self):
         return QSize(self.width(), self.height())
+        
 
     def paintEvent(self, e):
         """ paints the background with the blue border """
