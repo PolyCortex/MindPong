@@ -75,8 +75,8 @@ class PlayTab(QTabWidget):
     def set_pixmap_labels(self):
         # player logos
         self.player_logo_labels = [
-            self.get_picture_label(get_image_file(RED_PLAYER_FILE_NAME), (0.30, 0.30), (Qt.AlignCenter)),
-            self.get_picture_label(get_image_file(BLUE_PLAYER_FILE_NAME), (0.30, 0.30), (Qt.AlignCenter))
+            self.get_picture_label(get_image_file(RED_PLAYER_FILE_NAME), (0.25, 0.25), (Qt.AlignCenter)),
+            self.get_picture_label(get_image_file(BLUE_PLAYER_FILE_NAME), (0.25, 0.25), (Qt.AlignCenter))
         ]
         self.centralGridLayout.addWidget(self.player_logo_labels[0], 0, 0, 1, 2)
         self.centralGridLayout.addWidget(self.player_logo_labels[1], 0, 5, 1, 2)

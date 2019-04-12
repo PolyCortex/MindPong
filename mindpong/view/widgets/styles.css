@@ -3,3 +3,8 @@ QPushButton {
     margin: 30px 50px 0px 0px;
     background-color: rgb(255, 153, 57);
 }
+
+QComboBox {
+    padding: 5px 10px; 
+    margin: 30px 50px 0px 0px;
+}

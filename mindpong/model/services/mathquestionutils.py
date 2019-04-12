@@ -7,13 +7,13 @@ MAX_GAP_ANSWER = 99999
 MIN_GAP_ANSWER = 0
 
 class MathQuestionDifficulty(Enum):
-    EASY = 'EASY',
-    MEDIUM = 'MEDIUM',
-    HARD = 'HARD',
+    EASY = 'Easy'
+    MEDIUM = 'Medium'
+    HARD = 'Hard'
 
 
 class TermNumber(Enum):
-    TWO = 2,
+    TWO = 2
     THREE = 3
 
 

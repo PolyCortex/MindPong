@@ -8,8 +8,8 @@ from mindpong.model.services.mathquestionutils import (
     MathQuestionDifficulty)
 
 class MathMode(Enum):
-    Drill = 'Drill exercises',
-    Gap = 'Fill in the blank'
+    Drill = "Drill exercises"
+    Gap = "Fill in the blank"
 
 class MathExercise(object):
     QUESTIONS = {
@@ -17,7 +17,7 @@ class MathExercise(object):
         MathMode.Gap: "Question: Fill the gap with the the following operators: (+ - x %)"
     }
 
-    def __init__(self, mode=MathMode.Gap, difficulty=MathQuestionDifficulty.HARD, nb_terms=TermNumber.THREE):
+    def __init__(self, mode=MathMode.Drill, difficulty=MathQuestionDifficulty.EASY, nb_terms=TermNumber.THREE):
         self.mode = mode
         self.difficulty = difficulty
         self.nb_terms = nb_terms
@@ -38,14 +38,13 @@ class MathExercise(object):
             return self._complete_question['equation'] + " = _"
         else:
             operands = " _ ".join(self._complete_question['operands'])
-            print(operands)
             return "%s = %i"%(operands, self._complete_question['answer'])
     
     def get_answer(self):
         result = ""
 
         if self.mode is MathMode.Drill:
-            result = self.get_equation()[:-1] + " " + str(self._complete_question["answer"])
+            result = self.get_equation()[:-1] + " " + str(int(self._complete_question["answer"]))
         else:
             for i in range(len(self._complete_question['operands']) - 1):
                 result += self._complete_question['operands'][i] + " "
