@@ -1,9 +1,9 @@
 import os
 
-from PyQt5.QtGui import (QFont, QPixmap, QTransform)
+from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import (
     QTabWidget, QGridLayout, QLabel, 
-    QPushButton, QDialog, QMessageBox
+    QPushButton, QDialog, QMessageBox, QStyleFactory
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 import emoji
@@ -13,32 +13,34 @@ from serial import SerialException
 from mindpong.view.utils import (
     BACKGROUND_COLORS, IMAGES_PATH, MINDPONG_TITLE,
     get_image_file)
+from mindpong.view.widgets.scalablearrow import ScalableArrow
 from mindpong.model.game import GameState
 
-ARROW_FILE_NAME = 'arrow.png'
 PINGPONG_FILE_NAME = 'ball.png'
 RED_PLAYER_FILE_NAME = 'red_player.png'
 BLUE_PLAYER_FILE_NAME = 'blue_player.png'
 
 
 class PlayTab(QTabWidget):
-    update_signal_event = pyqtSignal()
+    update_signal_event = pyqtSignal(list)
 
     START_GAME_STRING = "▶️ Start"
     STOP_GAME_STRING = "⏹️ Stop"
 
     # (width_scale, height_scale)
-    ARROW_SCALES = [(0.75, 0.75), (0.75, 0.75)] 
     BALL_SCALE = (0.25, 0.25)
 
     def __init__(self):
         super().__init__()
+        self.setStyle(QStyleFactory.create('Fusion'))
         self.playersPath = [get_image_file(RED_PLAYER_FILE_NAME), get_image_file(BLUE_PLAYER_FILE_NAME)]
 
         self.centralGridLayout: QGridLayout
         self.playButton = QPushButton(emoji.emojize(PlayTab.START_GAME_STRING))
         self.countDownModal = QDialog(self)
         self.init_ui()
+
+        self.counter = 0.75
 
     def init_ui(self):
         self.init_labels_layout()
@@ -78,14 +80,9 @@ class PlayTab(QTabWidget):
         self.centralGridLayout.addWidget(self.player_logo_labels[1], 0, 5, 1, 2)
 
         # arrow pixmaps
-        self.arrow_labels = [
-            self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[0], (Qt.AlignLeft | Qt.AlignVCenter)),
-            self.mirror_player_arrow(
-                self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[1], (Qt.AlignRight | Qt.AlignVCenter))
-            )
-        ]
-        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 4, 1, 1)
-        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 2, 1, 1)
+        self.arrow_labels = [ScalableArrow(is_mirrored=True), ScalableArrow()]
+        self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 2, 1, 1, (Qt.AlignVCenter))
+        self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 4, 1, 1, (Qt.AlignVCenter))
 
         # ball pixmaps
         self.ball_label = self.get_picture_label(get_image_file(PINGPONG_FILE_NAME), self.BALL_SCALE, Qt.AlignCenter)
@@ -95,12 +92,8 @@ class PlayTab(QTabWidget):
     def get_picture_label(self, path, scale, alignment):
         label = QLabel()
         label.setAlignment(alignment)
-        label.setPixmap(QPixmap(path))
-        self._update_pixmap_scale(label, scale)        
-        return label
-
-    def mirror_player_arrow(self, label):
-        label.setPixmap(label.pixmap().transformed(QTransform().scale(-1,1)))
+        pixmap = QPixmap(path)
+        label.setPixmap(pixmap.scaled(pixmap.width() * scale[0], pixmap.height() * scale[1]))
         return label
         
     def init_buttons(self):
@@ -120,27 +113,18 @@ class PlayTab(QTabWidget):
     def set_delegate(self, delegate):
         self.delegate = delegate
 
-    def _update_pixmap_scale(self, label, scale):
-        pixmap: QPixmap = label.pixmap()
-        label.setPixmap(pixmap.scaled(pixmap.width() * scale[0], pixmap.height() * scale[1], Qt.KeepAspectRatio))
-
     def _update_signal(self, signal):
         # player 1 signal means - player 2 signal means
         signal_difference = signal[0][1] - signal[1][1]
+        current_winner = 0 if signal_difference > 0 else 1
+        current_loser = 0 if current_winner is 1 else 1
 
-        if signal_difference > 0: # player 1 is winning
-            pass
-        elif signal_difference < 0: # player 2 is winning
-            pass
-        else:
-            pass
-
-        #self.ARROW_SCALE = ()
-        #_update_pixmap_scale(self.arrow_label, self.ARROW_SCALE)
+        self.arrow_labels[current_winner].setVisible(True)
+        self.arrow_labels[current_loser].setVisible(False)
+        self.arrow_labels[current_winner].setWidth(abs(signal_difference))
 
 
     def _click_start_button_callback(self):
-
         if self.delegate and self.delegate.game.state == GameState.INITIAL:
             self._start_game()
 
@@ -162,6 +146,8 @@ class PlayTab(QTabWidget):
 
         self.playButton.setText(PlayTab.STOP_GAME_STRING)
         self.playButton.setStyleSheet(BACKGROUND_COLORS["RED"])
+
+
 
     def resizeEvent(self, event):
         # TODO: adjust labels to fit the screen correctly
