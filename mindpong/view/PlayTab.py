@@ -3,7 +3,7 @@ import os
 from PyQt5.QtGui import (QFont, QPixmap, QTransform)
 from PyQt5.QtWidgets import (
     QTabWidget, QGridLayout, QLabel, 
-    QPushButton, QDialog, QMessageBox
+    QPushButton, QDialog, QMessageBox, QStyleFactory
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 import emoji
@@ -22,7 +22,7 @@ BLUE_PLAYER_FILE_NAME = 'blue_player.png'
 
 
 class PlayTab(QTabWidget):
-    update_signal_event = pyqtSignal()
+    update_signal_event = pyqtSignal(list)
 
     START_GAME_STRING = "▶️ Start"
     STOP_GAME_STRING = "⏹️ Stop"
@@ -33,6 +33,7 @@ class PlayTab(QTabWidget):
 
     def __init__(self):
         super().__init__()
+        self.setStyle(QStyleFactory.create('Fusion'))
         self.playersPath = [get_image_file(RED_PLAYER_FILE_NAME), get_image_file(BLUE_PLAYER_FILE_NAME)]
 
         self.centralGridLayout: QGridLayout
@@ -84,6 +85,9 @@ class PlayTab(QTabWidget):
                 self.get_picture_label(get_image_file(ARROW_FILE_NAME), self.ARROW_SCALES[1], (Qt.AlignRight | Qt.AlignVCenter))
             )
         ]
+        for arrow_label in self.arrow_labels:
+            arrow_label.setVisible(True)
+
         self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 4, 1, 1)
         self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 2, 1, 1)
 
@@ -122,25 +126,28 @@ class PlayTab(QTabWidget):
 
     def _update_pixmap_scale(self, label, scale):
         pixmap: QPixmap = label.pixmap()
-        label.setPixmap(pixmap.scaled(pixmap.width() * scale[0], pixmap.height() * scale[1], Qt.KeepAspectRatio))
+        label.setPixmap(pixmap.scaled(int(pixmap.width() * scale[0]), int(pixmap.height() * scale[1]), Qt.KeepAspectRatio))
 
     def _update_signal(self, signal):
         # player 1 signal means - player 2 signal means
         signal_difference = signal[0][1] - signal[1][1]
 
-        if signal_difference > 0: # player 1 is winning
-            pass
-        elif signal_difference < 0: # player 2 is winning
-            pass
-        else:
-            pass
+        new_width_scale = min(abs(signal_difference*10), 1)
 
-        #self.ARROW_SCALE = ()
-        #_update_pixmap_scale(self.arrow_label, self.ARROW_SCALE)
+        if signal_difference > 0: # player 1 is winning
+            self.ARROW_SCALES[0] = (new_width_scale, self.ARROW_SCALES[0][1])
+            #self.arrow_labels[0].setVisible(True)
+            #self.arrow_labels[1].setVisible(False)
+            #self.arrow_labels[0].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[0], self.ARROW_SCALES[0]))
+        elif signal_difference < 0: # player 2 is winning
+            self.ARROW_SCALES[1] = (new_width_scale, self.ARROW_SCALES[1][1])
+            #self.arrow_labels[0].setVisible(False)
+            #self.arrow_labels[1].setVisible(True)
+            #self.arrow_labels[1].setPixmap(self._update_pixmap_scale(self.initial_arrow_pixmap[1], self.ARROW_SCALES[1]))
+
 
 
     def _click_start_button_callback(self):
-
         if self.delegate and self.delegate.game.state == GameState.INITIAL:
             self._start_game()
 
@@ -154,7 +161,7 @@ class PlayTab(QTabWidget):
 
     def _start_game(self):
         try:
-            self.delegate._start_game()
+            self.delegate.start_game()
         except SerialException as e:
             self.errorBox.setText("Error: can't connect to serial %s port" % (self.delegate.serial_communication.port))
             self.errorBox.show()

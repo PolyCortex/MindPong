@@ -55,6 +55,8 @@ class MainMenu(QMainWindow):
         self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
         self.tabWidget.addTab(self.statsTab, "📊 Statistics")
         self.tabWidget.addTab(self.settingsTab, emoji.emojize(" ⚙ Settings"))
+        self.tabWidget.setStyleSheet("QTabBar::tab { height: 50px; width: 300px}")
+        
 
     def set_delegate(self, delegate):
         self.delegate = delegate
