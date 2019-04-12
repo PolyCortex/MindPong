@@ -55,7 +55,6 @@ class PlayTab(QTabWidget):
 
         # Create Text Labels
         self.set_players_labels()
-        self.centralGridLayout.addWidget(QLabel("Math Question: "), 1, 0, 1, 2)
         # Create Button Labels
         self.centralGridLayout.addWidget(self.playButton, 2, 2, 1, 3)
         # Create Pixmap Labels
