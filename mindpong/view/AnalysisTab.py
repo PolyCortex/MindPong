@@ -17,40 +17,49 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, HistogramLUTItem
 
-from mindpong.model.services.historyreaderutils import read_player_signal
+from mindpong.model.services.historyreaderutils import read_player_signal, get_available_games
 from mindpong.model.player import PlayerName
 from pymuse.inputstream.muse_constants import MUSE_EEG_ACQUISITION_FREQUENCY
-
 
 
 class AnalysisTab(QTabWidget):
 
     def __init__(self):
         super().__init__()
-        self.centralLayout = QVBoxLayout()
+        self.game_selector = None
+        self.centralLayout = None
         self.init_ui()
 
     def init_ui(self):
-        self.create_game_selector()
+        self.centralLayout = QVBoxLayout()
+        self.game_selector = self.create_game_selector()
+        self.populate_game_selector()
         self.create_spectrograms('Game #0 - 2019-04-10-15_46_33')
         self.setLayout(self.centralLayout)
 
     def create_game_selector(self):
         self.centralLayout.addSpacing(20)
         game_selector = QComboBox(self)
-        line_edit = QLineEdit()
-        line_edit.setPlaceholderText('No Available Game for Analysis')
-        line_edit.setReadOnly(True)
-        game_selector.setLineEdit(line_edit)
         game_selector.setToolTip(
             'Please select a game to analyze the eeg activity.')
         game_selector.setFixedSize(230, 30)
         self.centralLayout.addWidget(game_selector)
         self.centralLayout.setAlignment(
             game_selector, Qt.AlignTop | Qt.AlignHCenter)
-        # TODO: We'll only be use in the function that reads for saved game
-        # game_selector.addItems(['Game #0 - 2019-04-10-19_20_38', 'Game #1 - 2019-04-10-19_20_41'])
+        return game_selector
 
+    def populate_game_selector(self):
+        self.game_list = get_available_games()
+        self.game_selector.clear()
+        if len(self.game_list):
+            self.game_selector.addItems(self.game_list)
+        else:
+            line_edit = QLineEdit()
+            line_edit.setPlaceholderText('No Available Game for Analysis')
+            line_edit.setReadOnly(True)
+            self.game_selector.setLineEdit(line_edit)
+        self.game_selector.update()
+    
     def create_spectrograms(self, game_name: str):
         ELECTRODES_NUMBER = 4
         setConfigOptions(imageAxisOrder='row-major')

@@ -8,7 +8,7 @@ def get_available_games():
     p = Path("History/")
     if not p.is_dir():
         raise FileNotFoundError("The directory History does not exist")
-    return [x for x in Path("History/").iterdir() if x.is_dir()]
+    return [x.parts[1] for x in Path("History/").iterdir() if x.is_dir()]
 
 
 def read_player_signal(game_name: str, player_name: PlayerName):
