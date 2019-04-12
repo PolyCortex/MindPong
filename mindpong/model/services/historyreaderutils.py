@@ -1,6 +1,6 @@
 from pathlib import Path
 import csv
-
+import numpy as np
 from mindpong.model.player import PlayerName
 
 
@@ -24,4 +24,5 @@ def read_player_signal(game_name: str, player_name: PlayerName):
                     signals[j-1].append(row[j])
             else:
                 headers = row[1:-1]
+        signals = [np.array(signal).astype(np.float) for signal in signals]
     return {headers[i]: signals[i] for i in range(len(headers))}

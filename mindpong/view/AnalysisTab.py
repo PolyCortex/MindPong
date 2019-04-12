@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QTabWidget
 from collections import deque
 import emoji
 import numpy as np
+from scipy import signal
 import pyqtgraph as pg
 from PyQt5.QtWidgets import (
     QTabWidget,
@@ -15,6 +16,11 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, HistogramLUTItem
+
+from mindpong.model.services.historyreaderutils import read_player_signal
+from mindpong.model.player import PlayerName
+from pymuse.inputstream.muse_constants import MUSE_EEG_ACQUISITION_FREQUENCY
+
 
 
 class AnalysisTab(QTabWidget):
@@ -43,7 +49,7 @@ class AnalysisTab(QTabWidget):
         self.centralLayout.setAlignment(
             game_selector, Qt.AlignTop | Qt.AlignHCenter)
         # TODO: We'll only be use in the function that reads for saved game
-        #game_selector.addItems(['Game #0 - 2019-04-10-19_20_38', 'Game #1 - 2019-04-10-19_20_41'])
+        # game_selector.addItems(['Game #0 - 2019-04-10-19_20_38', 'Game #1 - 2019-04-10-19_20_41'])
 
     def create_spectrograms(self):
         setConfigOptions(imageAxisOrder='row-major')
@@ -59,27 +65,40 @@ class AnalysisTab(QTabWidget):
         self.centralLayout.addLayout(spectrograms_layout)
 
     def create_spectrogram(self):
-        win = GraphicsLayoutWidget()
-        p1 = win.addPlot()
+        # https://stackoverflow.com/questions/51312923/plotting-the-spectrum-of-a-wavfile-in-pyqtgraph-using-scipy-signal-spectrogram
+        #TODO: Spectrogram acquisition here
+        f, t, Sxx = self.acquire_spectrogram_signal('Game #0 - 2019-04-10-15_46_33')
+        print ('F: ', f)
+        print ('t: ', t)
+
+        widget = GraphicsLayoutWidget()
+        plot = widget.addPlot()
         img = ImageItem()
-        p1.addItem(img)
+        plot.addItem(img)
         hist = HistogramLUTItem()
         hist.setImageItem(img)
-        win.addItem(hist)
-        win.show()
-        #hist.setLevels(np.min(Sxx), np.max(Sxx))
-        hist.gradient.restoreState(
-            {'mode': 'rgb',
-             'ticks': [(0.5, (0, 182, 188, 255)),
+        widget.addItem(hist)
+        widget.show()
+        hist.setLevels(np.min(Sxx), np.max(Sxx))
+        hist.gradient.restoreState({
+            'mode': 'rgb',
+            'ticks': [(0.5, (0, 182, 188, 255)),
                        (1.0, (246, 111, 0, 255)),
-                       (0.0, (75, 0, 113, 255))]})
-       # img.setImage(Sxx)
-        #img.scale(t[-1]/np.size(Sxx, axis=1), f[-1]/np.size(Sxx, axis=0))
-        #p1.setLimits(xMin=0, xMax=t[-1], yMin=0, yMax=f[-1])
-        p1.setLabel('bottom', "Time", units='s')
-        p1.setLabel('left', "Frequency", units='Hz')
-        return win
-
+                       (0.0, (75, 0, 113, 255))]
+        })
+        img.setImage(Sxx)
+        img.scale(t[-1]/np.size(Sxx, axis=1), f[-1]/np.size(Sxx, axis=0))
+        plot.setLimits(xMin=0, xMax=t[-1], yMin=0, yMax=f[-1])
+        plot.setLabel('bottom', "Time", units='s')
+        plot.setLabel('left', "Frequency", units='Hz')
+        return widget
 
     def set_delegate(self, delegate):
         self.delegate = delegate
+
+    def acquire_spectrogram_signal(self, game_name: str):
+        eeg_signal_player_one = read_player_signal(game_name, PlayerName.PLAYER_ONE)
+        eeg_signal_player_two = read_player_signal(game_name, PlayerName.PLAYER_TWO)
+        return {
+            signal.spectrogram(np.array(eeg_signal_player_one['electrode 0']), MUSE_EEG_ACQUISITION_FREQUENCY, nperseg=128, detrend='linear', scaling='density')
+        }
