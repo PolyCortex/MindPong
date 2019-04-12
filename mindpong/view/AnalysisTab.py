@@ -32,7 +32,7 @@ class AnalysisTab(QTabWidget):
 
     def init_ui(self):
         self.create_game_selector()
-        self.create_spectrograms()
+        self.create_spectrograms('Game #0 - 2019-04-10-15_46_33')
         self.setLayout(self.centralLayout)
 
     def create_game_selector(self):
@@ -51,26 +51,18 @@ class AnalysisTab(QTabWidget):
         # TODO: We'll only be use in the function that reads for saved game
         # game_selector.addItems(['Game #0 - 2019-04-10-19_20_38', 'Game #1 - 2019-04-10-19_20_41'])
 
-    def create_spectrograms(self):
+    def create_spectrograms(self, game_name: str):
+        ELECTRODES_NUMBER = 4
         setConfigOptions(imageAxisOrder='row-major')
         spectrograms_layout = QGridLayout()
-        spectrograms_layout.addWidget(self.create_spectrogram(), 0, 0)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 0, 1)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 1, 0)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 1, 1)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 2, 0)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 2, 1)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 3, 0)
-        spectrograms_layout.addWidget(self.create_spectrogram(), 3, 1)
+        for i, player_name in enumerate(PlayerName):
+            for j in range(ELECTRODES_NUMBER):
+                spectrograms_layout.addWidget(self.create_spectrogram(game_name, player_name, 'electrode %i'%j), j, i)
         self.centralLayout.addLayout(spectrograms_layout)
 
-    def create_spectrogram(self):
+    def create_spectrogram(self, game_name: str, player_name: PlayerName, electrode_name: str):
         # https://stackoverflow.com/questions/51312923/plotting-the-spectrum-of-a-wavfile-in-pyqtgraph-using-scipy-signal-spectrogram
-        #TODO: Spectrogram acquisition here
-        f, t, Sxx = self.acquire_spectrogram_signal('Game #0 - 2019-04-10-15_46_33')
-        print ('F: ', f)
-        print ('t: ', t)
-
+        f, t, Sxx = self._acquire_spectrogram_signal(game_name, player_name, electrode_name)
         widget = GraphicsLayoutWidget()
         plot = widget.addPlot()
         img = ImageItem()
@@ -78,7 +70,6 @@ class AnalysisTab(QTabWidget):
         hist = HistogramLUTItem()
         hist.setImageItem(img)
         widget.addItem(hist)
-        widget.show()
         hist.setLevels(np.min(Sxx), np.max(Sxx))
         hist.gradient.restoreState({
             'mode': 'rgb',
@@ -96,9 +87,14 @@ class AnalysisTab(QTabWidget):
     def set_delegate(self, delegate):
         self.delegate = delegate
 
-    def acquire_spectrogram_signal(self, game_name: str):
-        eeg_signal_player_one = read_player_signal(game_name, PlayerName.PLAYER_ONE)
-        eeg_signal_player_two = read_player_signal(game_name, PlayerName.PLAYER_TWO)
-        return {
-            signal.spectrogram(np.array(eeg_signal_player_one['electrode 0']), MUSE_EEG_ACQUISITION_FREQUENCY, nperseg=128, detrend='linear', scaling='density')
-        }
+    def _acquire_spectrogram_signal(self, game_name: str, player_name: PlayerName, electrode_name: str):
+        eeg_signal = read_player_signal(game_name, player_name)
+        f, t, Sxx = signal.spectrogram(np.array(eeg_signal[electrode_name]), MUSE_EEG_ACQUISITION_FREQUENCY, nperseg=128, detrend='linear', scaling='density')
+        return self._remove_high_frequencies(f, t, Sxx)
+
+    def _remove_high_frequencies(self, f, t, Sxx):
+        F_MAX = 40
+        freq_slice = np.where(f <= F_MAX)
+        f   = f[freq_slice]
+        Sxx = Sxx[freq_slice,:][0]
+        return (f, t, Sxx)
