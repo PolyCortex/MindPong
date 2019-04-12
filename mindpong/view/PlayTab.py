@@ -116,16 +116,12 @@ class PlayTab(QTabWidget):
     def _update_signal(self, signal):
         # player 1 signal means - player 2 signal means
         signal_difference = signal[0][1] - signal[1][1]
-        
-        if signal_difference > 0: # player 1 is winning
-            self.arrow_labels[0].setVisible(True)
-            self.arrow_labels[1].setVisible(False)
-            self.arrow_labels[0].setWidth(abs(signal_difference))
-        elif signal_difference < 0: # player 2 is winning
-            self.arrow_labels[0].setVisible(False)
-            self.arrow_labels[1].setVisible(True)
-            self.arrow_labels[1].setWidth(abs(signal_difference))
+        current_winner = 0 if signal_difference > 0 else 1
+        current_loser = 0 if current_winner is 1 else 1
 
+        self.arrow_labels[current_winner].setVisible(True)
+        self.arrow_labels[current_loser].setVisible(False)
+        self.arrow_labels[current_winner].setWidth(abs(signal_difference))
 
 
     def _click_start_button_callback(self):
