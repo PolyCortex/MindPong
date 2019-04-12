@@ -3,7 +3,8 @@ import os
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import (
     QTabWidget, QGridLayout, QLabel, 
-    QPushButton, QDialog, QMessageBox, QStyleFactory
+    QPushButton, QDialog, QMessageBox,
+    QStyleFactory
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 import emoji
@@ -51,6 +52,7 @@ class PlayTab(QTabWidget):
 
     def init_labels_layout(self):
         self.centralGridLayout = QGridLayout()
+        self.centralGridLayout.setRowMinimumHeight(2, 100)
         self.setLayout(self.centralGridLayout)
 
         # Create Text Labels

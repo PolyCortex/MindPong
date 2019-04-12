@@ -22,7 +22,7 @@ def generate_gap_question(difficulty: MathQuestionDifficulty):
     is_operation_valid = False
     answer = 0
     while not is_operation_valid:
-        operands = [randint(1, operands_max_number(difficulty))
+        operands = [str(randint(1, operands_max_number(difficulty)))
                     for _ in range(OPERANDS_GAP_QTY)]
         operators = [OPERATORS[randint(0, 3)]
                         for _ in range(OPERANDS_GAP_QTY - 1)]
