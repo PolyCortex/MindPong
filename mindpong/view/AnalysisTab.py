@@ -10,11 +10,14 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QGridLayout,
+    QScrollArea,
     QComboBox,
     QLabel,
+    QWidget,
     QLineEdit
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtGui import QPalette
 from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, HistogramLUTItem
 
 from mindpong.model.services.historyreaderutils import read_player_signal, get_available_games
@@ -22,6 +25,7 @@ from mindpong.model.player import PlayerName
 from pymuse.inputstream.muse_constants import MUSE_EEG_ACQUISITION_FREQUENCY
 
 NO_AVAILABLE_GAMES = 'No Available Game for Analysis'
+SCROLL_AREA_HEIGHT = 3000
 
 class AnalysisTab(QTabWidget):
 
@@ -29,29 +33,43 @@ class AnalysisTab(QTabWidget):
         super().__init__()
         self.game_list = None
         self.game_selector = None
+        self.scrollarea = None
         self.centralLayout = None
+        self.analysisLayout = None
         self.spectrograms_layout = None
         self.spectrogram_widgets = []
         self.init_ui()
 
     def init_ui(self):
         self.centralLayout = QVBoxLayout()
+        self.analysisLayout = QVBoxLayout()
         self.game_selector = self.create_game_selector()
+        self.analysisLayout.addSpacing(20)
+        self.analysisLayout.addWidget(self.game_selector)
+        self.analysisLayout.setAlignment(self.game_selector, Qt.AlignTop | Qt.AlignHCenter)
         self.populate_game_selector()
         if len(self.game_list):
             self.spectrograms_layout = self.create_spectrograms_layout(self.game_selector.currentText())
-            self.centralLayout.addLayout(self.spectrograms_layout)
+            self.analysisLayout.addLayout(self.spectrograms_layout)
+        scrollarea = self.create_scroll_area()
+        self.centralLayout.addWidget(scrollarea)
         self.setLayout(self.centralLayout)
 
+    def create_scroll_area(self):
+        scrollarea = QScrollArea(self)
+        widget = QWidget()
+        widget.setMinimumHeight(SCROLL_AREA_HEIGHT)
+        widget.setLayout(self.analysisLayout)
+        scrollarea.setWidget(widget)
+        scrollarea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scrollarea.setWidgetResizable(True)
+        return scrollarea
+
     def create_game_selector(self):
-        self.centralLayout.addSpacing(20)
         game_selector = QComboBox(self)
         game_selector.setToolTip(
             'Please select a game to analyze the eeg activity.')
         game_selector.setFixedSize(230, 30)
-        self.centralLayout.addWidget(game_selector)
-        self.centralLayout.setAlignment(
-            game_selector, Qt.AlignTop | Qt.AlignHCenter)
         game_selector.currentTextChanged.connect(self.on_game_selector_change)
         return game_selector
 
@@ -108,7 +126,7 @@ class AnalysisTab(QTabWidget):
             for spectrogram_widget in self.spectrogram_widgets:
                 spectrogram_widget[0].clear()
                 self.add_spectrogram_to_widget(spectrogram_widget[0], selected_game, spectrogram_widget[1], "electrode %i"%spectrogram_widget[2])
-            self.centralLayout.update()
+            self.analysisLayout.update()
 
     def _acquire_spectrogram_signal(self, game_name: str, player_name: PlayerName, electrode_name: str):
         eeg_signal = read_player_signal(game_name, player_name)

@@ -71,7 +71,7 @@ class MainMenu(QMainWindow):
         self.delegate.end_game()
     
     def onChange(self, tab_idx):
-        if tab_idx == self.PLAY_TAB_INDEX:
+       if tab_idx == self.PLAY_TAB_INDEX:
             self.analysisTab.populate_game_selector()
 
 
