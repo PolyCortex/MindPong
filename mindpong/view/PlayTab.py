@@ -14,6 +14,7 @@ from mindpong.view.utils import (
     BACKGROUND_COLORS, IMAGES_PATH, MINDPONG_TITLE,
     get_image_file)
 from mindpong.view.widgets.scalablearrow import ScalableArrow
+from mindpong.view.widgets.mathquestions import MathQuestions
 from mindpong.model.game import GameState
 
 PINGPONG_FILE_NAME = 'ball.png'
@@ -83,6 +84,9 @@ class PlayTab(QTabWidget):
         self.arrow_labels = [ScalableArrow(is_mirrored=True), ScalableArrow()]
         self.centralGridLayout.addWidget(self.arrow_labels[0], 0, 2, 1, 1, (Qt.AlignVCenter))
         self.centralGridLayout.addWidget(self.arrow_labels[1], 0, 4, 1, 1, (Qt.AlignVCenter))
+
+        # mathquestions widget
+        self.centralGridLayout.addWidget(MathQuestions(), 1, 1, 1, 5, (Qt.AlignVCenter))
 
         # ball pixmaps
         self.ball_label = self.get_picture_label(get_image_file(PINGPONG_FILE_NAME), self.BALL_SCALE, Qt.AlignCenter)

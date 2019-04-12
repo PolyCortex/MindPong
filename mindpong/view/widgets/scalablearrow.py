@@ -1,7 +1,7 @@
 
 from PyQt5.QtGui import QPixmap, QPainter, QTransform
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import Qt, QSize, QRect
+from PyQt5.QtCore import Qt, QSize
 
 from mindpong.view.utils import (
     get_image_file)
@@ -15,7 +15,7 @@ class ScalableArrow(QWidget):
 
     def __init__(self, is_mirrored=False):
         super().__init__()
-        self.visible = True
+        self.visible = False
         self._is_mirrored = is_mirrored
         self._arrow_scale = self.MAX_SCALE
         self._init_pixmap()
