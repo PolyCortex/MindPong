@@ -126,9 +126,11 @@ class PlayTab(QTabWidget):
         current_winner = 0 if signal_difference > 0 else 1
         current_loser = 0 if current_winner is 1 else 1
 
-        self.arrow_labels[current_winner].setVisible(True)
-        self.arrow_labels[current_loser].setVisible(False)
+        self.arrow_labels[current_winner].visible = True
+        self.arrow_labels[current_loser].visible = False
+        self.arrow_labels[current_loser].update()
         self.arrow_labels[current_winner].setWidth(abs(signal_difference))
+        self.arrow_labels[current_winner].update()
 
 
     def _click_start_button_callback(self):

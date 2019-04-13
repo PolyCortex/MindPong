@@ -32,8 +32,7 @@ class ScalableArrow(QWidget):
         return QSize(self.width(), self.height())
 
     def setWidth(self, scale):
-        self._arrow_scale = min(scale*10, self.MAX_SCALE)
-        self.update()
+        self._arrow_scale = min(max(0.1, scale*10), self.MAX_SCALE)
 
     def paintEvent(self, event):
         if self.visible:
@@ -49,3 +48,4 @@ class ScalableArrow(QWidget):
             painter.drawPixmap(dest_position[0], dest_position[1], dest_dimensions[0], dest_dimensions[1], self.initial_pixmap.scaled(
                 dest_dimensions[0], dest_dimensions[1], transformMode=Qt.SmoothTransformation))
             painter.end()
+            
