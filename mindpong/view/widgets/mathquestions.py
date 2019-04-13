@@ -16,9 +16,9 @@ class MathQuestions(QWidget):
     CHECK_ANSWER_BUTTON_TITLE = 'Check Answer'
     NEXT_QUESTION_BUTTON_TITLE = 'Next Question'
     CONCENTRATION_OBJ_NAME = "toggle_concentration"
-    CONCENTRATION_BUTTON_TITLE = 'Concentration Mode'
+    CONCENTRATION_BUTTON_TITLE = 'Switch to Concentration Mode'
     RELAXATION_OBJ_NAME = "toggle_relaxation"
-    RELAXATION_BUTTON_TITLE = 'Relaxation Mode'
+    RELAXATION_BUTTON_TITLE = 'Switch to Relaxation Mode'
     RELAXATION_TITLE = "Please relax now..."
     RELAXATION_BODY = "✋✋ 🧠🧠 ✋✋"
 
@@ -65,14 +65,14 @@ class MathQuestions(QWidget):
         # Check answer button
         self.check_answer_button = QPushButton(self.CHECK_ANSWER_BUTTON_TITLE)
         self.check_answer_button.setObjectName("check_answer")
-        self.check_answer_button.setMaximumWidth(self.check_answer_button.width() * 0.4)
+        self.check_answer_button.setMaximumWidth(self.check_answer_button.width() * 0.5)
         self.check_answer_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
         self.check_answer_button.clicked.connect(self._on_click_answer_button)
 
         # Toggle concentration button
-        self.toggle_mode_button = QPushButton(self.CONCENTRATION_BUTTON_TITLE)
-        self.toggle_mode_button.setObjectName(self.CONCENTRATION_OBJ_NAME)
-        self.toggle_mode_button.setMaximumWidth(self.toggle_mode_button.width() * 0.4)
+        self.toggle_mode_button = QPushButton(self.RELAXATION_BUTTON_TITLE)
+        self.toggle_mode_button.setObjectName(self.RELAXATION_OBJ_NAME)
+        self.toggle_mode_button.setMaximumWidth(self.toggle_mode_button.width() * 0.5)
         self.toggle_mode_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
         self.toggle_mode_button.clicked.connect(self._on_click_toggle_mode)
 
@@ -119,7 +119,7 @@ class MathQuestions(QWidget):
         if self.is_relaxation_activated:
             self._link_model()
             self.toggle_mode_button.setText(self.RELAXATION_BUTTON_TITLE)
-            self.toggle_mode_button.setObjectName(self.CONCENTRATION_OBJ_NAME)
+            self.toggle_mode_button.setObjectName(self.RELAXATION_OBJ_NAME)
             self.toggle_mode_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
             self._enable_configuration_panel(False)
             self.is_relaxation_activated = False
@@ -128,7 +128,7 @@ class MathQuestions(QWidget):
             self._math_question.setText(self.RELAXATION_TITLE)
             self._equation_label.setText(self.RELAXATION_BODY)
             self.toggle_mode_button.setText(self.CONCENTRATION_BUTTON_TITLE)
-            self.toggle_mode_button.setObjectName(self.RELAXATION_OBJ_NAME)
+            self.toggle_mode_button.setObjectName(self.CONCENTRATION_OBJ_NAME)
             self.toggle_mode_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
             self._enable_configuration_panel(True)
             self.is_relaxation_activated = True

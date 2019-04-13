@@ -4,7 +4,7 @@ from mindpong.utils import get_project_root
 
 BACKGROUND_COLORS = {
     'GREEN': "background-color: #00a443",
-    'RED': "background-color: #ff0000"
+    'RED': "background-color: #ff4141"
 }
 
 IMAGES_PATH = 'img_src'

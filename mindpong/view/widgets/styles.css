@@ -7,12 +7,12 @@ QPushButton#check_answer {
     background-color: rgb(255, 153, 57);
 }
 
-QPushButton#toggle_concentration {
+QPushButton#toggle_relaxation {
     background-color: rgb(0, 91, 177);
     color: white;
 }
 
-QPushButton#toggle_relaxation {
+QPushButton#toggle_concentration {
     background-color: rgb(255, 65, 65)
 }
 
