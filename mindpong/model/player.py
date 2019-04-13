@@ -10,8 +10,8 @@ SIGNAL_NAMES = ['beta_relative', 'eeg']
 
 
 class PlayerName(Enum):
-    PLAYER_ONE = 'Player One',
-    PLAYER_TWO = 'Player Two',
+    PLAYER_ONE = 'Player One'
+    PLAYER_TWO = 'Player Two'
 
 
 class Player(object):
@@ -60,9 +60,10 @@ class Player(object):
             self.is_playing = True
 
     def stop(self):
+        if self.is_playing:
+            self._signals.shutdown()
+            self.eeg_pipeline.shutdown()
         self.is_playing = False
-        self.signals.shutdown()
-        self.eeg_pipeline.shutdown()
 
     def _configure_pipeline(self, game_name):
         self._signals = MuseOSCInputStream(
