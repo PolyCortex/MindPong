@@ -15,6 +15,7 @@ class MathQuestions(QWidget):
     INITIALIZING_TITLE = "Initializing..."
     CHECK_ANSWER_BUTTON_TITLE = 'Check Answer'
     NEXT_QUESTION_BUTTON_TITLE = 'Next Question'
+    TOGGLE_CONCENTRATION_BUTTON_TITLE = 'Concentration Mode'
 
     def __init__(self):
         super().__init__()
@@ -55,16 +56,25 @@ class MathQuestions(QWidget):
             tooltip="Change the math equation's difficulty"
         )
 
-        # Add check answer button
+        # Check answer button
         self.check_answer_button = QPushButton(self.CHECK_ANSWER_BUTTON_TITLE)
-        self.check_answer_button.setMaximumWidth(self.check_answer_button.width() * 0.3)
+        self.check_answer_button.setObjectName("check_answer")
+        self.check_answer_button.setMaximumWidth(self.check_answer_button.width() * 0.4)
         self.check_answer_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
         self.check_answer_button.clicked.connect(self._on_click_answer_button)
+
+        # Toggle concentration button
+        self.toggle_concentration_button = QPushButton(self.TOGGLE_CONCENTRATION_BUTTON_TITLE)
+        self.toggle_concentration_button.setObjectName("toggle_concentration")
+        self.toggle_concentration_button.setMaximumWidth(self.toggle_concentration_button.width() * 0.4)
+        self.toggle_concentration_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
+        self.toggle_concentration_button.clicked.connect(self._on_click_toggle_concentration)
 
         self.config_panel_layout.addWidget(self.mode_combo_box)
         self.config_panel_layout.addWidget(self.difficulty_combo_box)
         self.config_panel_layout.addSpacing(80)
         self.config_panel_layout.addWidget(self.check_answer_button)
+        self.config_panel_layout.addWidget(self.toggle_concentration_button)
         self.grid.addLayout(self.config_panel_layout, 0, 1, 2, 1, (Qt.AlignVCenter))
 
     def _init_combo_box(self, items, changed_callback, tooltip):
@@ -98,6 +108,9 @@ class MathQuestions(QWidget):
             self._equation_label.setText(self._exercice_model.get_answer())
             self.check_answer_button.setText(self.NEXT_QUESTION_BUTTON_TITLE)
             self._exercice_model.has_shown_answer = True
+
+    def _on_click_toggle_concentration(self, event):
+        pass
 
     def _mode_changed(self, text):
         new_mode = MathMode(text)

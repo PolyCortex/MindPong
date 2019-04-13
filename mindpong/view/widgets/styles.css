@@ -1,7 +1,15 @@
 QPushButton {
     padding: 10px 0px; 
     margin: 30px 50px 0px 0px;
+}
+
+QPushButton#check_answer {
     background-color: rgb(255, 153, 57);
+}
+
+QPushButton#toggle_concentration {
+    background-color: rgb(0, 91, 177);
+    color: white;
 }
 
 QComboBox {
