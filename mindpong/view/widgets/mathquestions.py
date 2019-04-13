@@ -46,11 +46,13 @@ class MathQuestions(QWidget):
 
         self.mode_combo_box = self._init_combo_box(
             [mode.value for mode in MathMode],
-            self._mode_changed
+            changed_callback=self._mode_changed,
+            tooltip="Change the math exercise type"
         )
         self.difficulty_combo_box = self._init_combo_box(
             [diff.value for diff in MathQuestionDifficulty],
-            self._difficulty_changed
+            changed_callback=self._difficulty_changed,
+            tooltip="Change the math equation's difficulty"
         )
 
         # Add check answer button
@@ -65,9 +67,10 @@ class MathQuestions(QWidget):
         self.config_panel_layout.addWidget(self.check_answer_button)
         self.grid.addLayout(self.config_panel_layout, 0, 1, 2, 1, (Qt.AlignVCenter))
 
-    def _init_combo_box(self, items, changed_callback):
+    def _init_combo_box(self, items, changed_callback, tooltip):
         combo_box = QComboBox()
         combo_box.setStyleSheet(open(STYLE_SHEET_PATH).read())
+        combo_box.setToolTip(tooltip)
         combo_box.addItems(items)
         combo_box.setMinimumWidth(combo_box.width() * 0.35)
         combo_box.setMinimumHeight(combo_box.height() * 0.15)
