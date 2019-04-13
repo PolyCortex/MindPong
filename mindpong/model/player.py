@@ -69,4 +69,4 @@ class Player(object):
         self._signals = MuseOSCInputStream(
             SIGNAL_NAMES, self._ip_address, self._port)
         self.eeg_pipeline = Pipeline(self.signals.get_signal('eeg'),
-                                     MuseCSVOutputStream('History/%s/%s' % (game_name, self._player_name.value[0])))
+                                     MuseCSVOutputStream('History/%s/%s' % (game_name, self._player_name.value)))
