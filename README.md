@@ -14,7 +14,8 @@ The Mindpong interface displays three sections:
 - An analysis tab that features eeg signal graphics and spectrograms.
 - A settings tab to setup the communication.
 
-![Interface of Mindpong](https://lh3.googleusercontent.com/B1HaWQ-g6CeQk5Wn0FcjbYWXwTdrNBvXyfggDLommGk11zaciuiIpC7W1LnE8SFuzzOwKTqNOr57) 
+![Interface of Mindpong](https://lh3.googleusercontent.com/B1HaWQ-g6CeQk5Wn0FcjbYWXwTdrNBvXyfggDLommGk11zaciuiIpC7W1LnE8SFuzzOwKTqNOr57)
+
 *Figure 1: Play section of the mindpong app.*
 
 The goal of the game is to compare the EEG activity when a subject is doing calculation v.s. when the subject is relaxing. To do so, the application generates random math questions and feature a relaxing mode.
@@ -31,7 +32,7 @@ The goal of the game is to compare the EEG activity when a subject is doing calc
 
   
 
-The necessary setup is a ping pong ball in a transparent plastic tube with two fans at the edges of the tube. They are connected to an Arduino Uno which is linked to a computer which then receives the signal from two Muse headbands via bluetooth. We use Muse Direct/MuseIO to obtain beta waves from the headbands.
+The necessary setup is a ping pong ball in a transparent plastic tube with two fans at the edges of the tube. They are connected to an Arduino Uno which is linked to a computer which then receives the signal from two Muse headbands via bluetooth. We use Muse Direct to obtain beta waves from the headbands.
 
   
 
@@ -143,38 +144,6 @@ Pip should install all requirements, including:
 3. Start ./mindpong.py in a terminal:
 
   
-
-> python ./mindpong.py
-
-  
-
-4. Press play.
-
-  
-  
-
-### To run mindpong.py on MacOS/Linux
-
-  
-  
-
-1. Connect your two Muse headsets with your computer by bluetooth
-
-  
-
-2. Start two terminal and run Muse IO in each. Set an OSC UDP output for player one (localhost:5001) and player two (localhost:5002):
-
-  
-
-> muse-io --device Muse-XXXX --osc osc.udp://localhost:5001
-
-  
-
-> muse-io --device Muse-XXXX --osc osc.udp://localhost:5002
-
-  
-
-3. Start ./mindpong.py in a terminal:
 
 > python ./mindpong.py
 
