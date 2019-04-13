@@ -22,6 +22,7 @@ from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, Histogr
 
 from mindpong.model.services.historyreaderutils import read_player_signal, get_available_games
 from mindpong.model.player import PlayerName
+from mindpong.view.widgets.scroller import Scroller
 from pymuse.inputstream.muse_constants import MUSE_EEG_ACQUISITION_FREQUENCY
 
 NO_AVAILABLE_GAMES = 'No Available Game for Analysis'
@@ -68,7 +69,7 @@ class AnalysisTab(QTabWidget):
         self.setLayout(self.centralLayout)
 
     def create_scroll_area(self):
-        scrollarea = QScrollArea(self)
+        scrollarea = Scroller()
         widget = QWidget()
         widget.setMinimumHeight(SCROLL_AREA_HEIGHT)
         widget.setLayout(self.analysisLayout)
