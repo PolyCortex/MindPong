@@ -5,6 +5,6 @@ PyQt5
 pyserial
 scipy
 
-git+git://github.com/PolyCortex/pyMuse.git@feature/update-to-py3/base
+git+git://github.com/PolyCortex/pyMuse.git@master
 python-osc>=1.7.0
 dataclasses
