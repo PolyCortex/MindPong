@@ -14,7 +14,7 @@ class MathMode(Enum):
 class MathExercise(object):
     QUESTIONS = {
         MathMode.Drill: "Question: Resolve the following equation",
-        MathMode.Gap: "Question: Fill the gap with the the following operators: (+ - x %)"
+        MathMode.Gap: "Question: Fill the gap with the operators + - x %"
     }
 
     def __init__(self, mode=MathMode.Drill, difficulty=MathQuestionDifficulty.EASY, nb_terms=TermNumber.THREE):

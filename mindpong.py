@@ -6,10 +6,12 @@ from mindpong.view.MainMenu import MainMenu
 from mindpong.model.game import Game
 from mindpong.model.serial_communication import SerialCommunication
 from mindpong.delegate.delegate import Delegate
+from mindpong.utils import create_palette
 
 
 def main():
     app = QApplication(sys.argv)
+    QApplication.setPalette(create_palette())
     app.setStyle(QStyleFactory.create('Fusion'))
 
     # delegate
