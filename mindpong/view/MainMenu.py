@@ -22,6 +22,7 @@ class MainMenu(QMainWindow):
     DEFAULT_MENU_HEIGHT = 800
     DEFAULT_MENU_WIDTH = 640
     PLAY_TAB_INDEX = 1
+    SETTINGS_TAB_INDEX = 2
 
     def __init__(self):
         super().__init__()
@@ -73,8 +74,10 @@ class MainMenu(QMainWindow):
         self.delegate.end_game()
     
     def onChange(self, tab_idx):
-       if tab_idx == self.PLAY_TAB_INDEX:
+        if tab_idx == self.PLAY_TAB_INDEX:
             self.analysisTab.populate_game_selector()
+        elif tab_idx == self.SETTINGS_TAB_INDEX:
+            self.settingsTab.populate_fields()
 
 
 if __name__ == '__main__':
