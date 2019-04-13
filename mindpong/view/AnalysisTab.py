@@ -36,7 +36,7 @@ class AnalysisTab(QTabWidget):
         self.scrollarea = None
         self.centralLayout = None
         self.analysisLayout = None
-        self.spectrograms_layout = None
+        self.graphics_layout = None
         self.spectrogram_widgets = []
         self.init_ui()
 
@@ -44,13 +44,15 @@ class AnalysisTab(QTabWidget):
         self.centralLayout = QVBoxLayout()
         self.analysisLayout = QVBoxLayout()
         self.game_selector = self.create_game_selector()
-        self.analysisLayout.addSpacing(20)
+        self.analysisLayout.addSpacing(40)
+        self.analysisLayout.setSpacing(40)
         self.analysisLayout.addWidget(self.game_selector)
+        self.analysisLayout
         self.analysisLayout.setAlignment(self.game_selector, Qt.AlignTop | Qt.AlignHCenter)
         self.populate_game_selector()
         if len(self.game_list):
-            self.spectrograms_layout = self.create_spectrograms_layout(self.game_selector.currentText())
-            self.analysisLayout.addLayout(self.spectrograms_layout)
+            self.graphics_layout = self.create_graphics_layout(self.game_selector.currentText())
+            self.analysisLayout.addLayout(self.graphics_layout)
         scrollarea = self.create_scroll_area()
         self.centralLayout.addWidget(scrollarea)
         self.setLayout(self.centralLayout)
@@ -85,16 +87,18 @@ class AnalysisTab(QTabWidget):
             self.game_selector.setLineEdit(line_edit)
         self.game_selector.update()
     
-    def create_spectrograms_layout(self, game_name: str):
+    def create_graphics_layout(self, game_name: str):
         ELECTRODES_NUMBER = 4
         setConfigOptions(imageAxisOrder='row-major')
-        spectrograms_layout = QGridLayout()
+        graphics_layout = QGridLayout()
+        graphics_layout.setHorizontalSpacing(100)
+        graphics_layout.setVerticalSpacing(60)
         for i, player_name in enumerate(PlayerName):
             for j in range(ELECTRODES_NUMBER):
                 spectrogram_widget = GraphicsLayoutWidget()
                 self.spectrogram_widgets.append((spectrogram_widget, player_name, j))
-                spectrograms_layout.addWidget(spectrogram_widget, j, i)
-        return spectrograms_layout
+                graphics_layout.addWidget(spectrogram_widget, j, i)
+        return graphics_layout
 
     def add_spectrogram_to_widget(self, widget: GraphicsLayoutWidget, game_name: str, player_name: PlayerName, electrode_name: str):
         # https://stackoverflow.com/questions/51312923/plotting-the-spectrum-of-a-wavfile-in-pyqtgraph-using-scipy-signal-spectrogram
