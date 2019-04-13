@@ -6,9 +6,9 @@ MindPong is a fantastic EEG multiplayer game requiring two Muse headbands and an
 
 ![](https://lh3.googleusercontent.com/hYLyprlF2NU10iol23kcK9le9mxZFwJHhowW4WIG_MiD-Xwt7dxBypljR12KK2bUvDECs3nIVfNz  "Mindpong")
 
-*Figure 1 : rough idea of our hardware setup.*
+*Figure 1 : rough idea of our hardware setup*
 
-The necessary setup is a ping pong ball in a transparent plastic tube with two fans at the edges of the tube. They are connected to an Arduino Uno wich is linked to a computer which receives the signal from two Muse headbands via bluetooth. We use Muse Direct/MuseIO to obtain beta waves from the headbands.
+The necessary setup is a ping pong ball in a transparent plastic tube with two fans at the edges of the tube. They are connected to an Arduino Uno which is linked to a computer which then receives the signal from two Muse headbands via bluetooth. We use Muse Direct/MuseIO to obtain beta waves from the headbands.
 
 ### Electrical circuits
 
@@ -28,15 +28,11 @@ The flags circuit is really simple. It is composed of three components for each 
 ## Installation
 You will need a few tools to get started with Muse headset and pyMuse:
 
-*  [MuseDirect](http://developer.choosemuse.com/tools/windows-tools) (Windows) or [MuseIO](http://developer.choosemuse.com/tools/mac-tools) (MacOS) or [MuseIO](http://developer.choosemuse.com/tools/linux-tools)(Linux)
+*  [MuseDirect](https://www.microsoft.com/en-us/p/muse-direct/9p0mbp6nv07x?activetab=pivot:overviewtab) (Windows)
 
 *  [Python 3.7](https://www.python.org/downloads/release/python-370/)
 
 Don't hesitate to go on [Muse Developer website](http://developer.choosemuse.com/) for additionnal information.
-
-### Prerequisites
-
-You must have Python 3.7 installed and you must have installed the toolkit from the [Muse Developper website](http://developer.choosemuse.com/tools/windows-tools).
 
 
 ### Installation of dependencies
