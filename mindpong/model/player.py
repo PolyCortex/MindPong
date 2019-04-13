@@ -10,8 +10,8 @@ SIGNAL_NAMES = ['beta_relative', 'eeg']
 
 
 class PlayerName(Enum):
-    PLAYER_ONE = 'Player One',
-    PLAYER_TWO = 'Player Two',
+    PLAYER_ONE = 'Player One'
+    PLAYER_TWO = 'Player Two'
 
 
 class Player(object):

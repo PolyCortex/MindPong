@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
     QLineEdit
 )
 from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPalette
+from PyQt5.QtGui import QFont
 from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, HistogramLUTItem, PlotItem, mkPen
 
 from mindpong.model.services.historyreaderutils import read_player_signal, get_available_games
@@ -26,6 +26,15 @@ from pymuse.inputstream.muse_constants import MUSE_EEG_ACQUISITION_FREQUENCY
 
 NO_AVAILABLE_GAMES = 'No Available Game for Analysis'
 SCROLL_AREA_HEIGHT = 3000
+
+ELECTRODES = {
+    'electrode 0': 'TP9',
+    'electrode 1': 'AF7',
+    'electrode 2': 'AF8',
+    'electrode 3': 'TP10',
+    'electrode 4': 'extra0',
+    'electrode 5': 'extra1'
+}
 
 class AnalysisTab(QTabWidget):
 
@@ -72,7 +81,7 @@ class AnalysisTab(QTabWidget):
         game_selector = QComboBox(self)
         game_selector.setToolTip(
             'Please select a game to analyze the eeg activity.')
-        game_selector.setFixedSize(230, 30)
+        game_selector.setFixedSize(230, 40)
         game_selector.currentTextChanged.connect(self.on_game_selector_change)
         return game_selector
 
@@ -95,14 +104,16 @@ class AnalysisTab(QTabWidget):
         graphics_layout.setHorizontalSpacing(100)
         graphics_layout.setVerticalSpacing(60)
         for i, player_name in enumerate(PlayerName):
+            player_label = QLabel(player_name.value)
+            player_label.setFont(QFont("Times", 22, QFont.Bold))
+            graphics_layout.addWidget(player_label, 0, i)
             for j in range(ELECTRODES_NUMBER):
-                row = 2 * j
                 eeg_graph_widget = GraphicsLayoutWidget()
                 spectrogram_widget = GraphicsLayoutWidget()
-                self.eeg_graph_widgets.append((eeg_graph_widget, player_name, j))
-                self.spectrogram_widgets.append((spectrogram_widget, player_name, j))
-                graphics_layout.addWidget(eeg_graph_widget, j, i)
-                graphics_layout.addWidget(spectrogram_widget, j + 4, i)
+                self.eeg_graph_widgets.append((eeg_graph_widget, player_name.value, j))
+                self.spectrogram_widgets.append((spectrogram_widget, player_name.value, j))
+                graphics_layout.addWidget(eeg_graph_widget, j*2 + 1, i)
+                graphics_layout.addWidget(spectrogram_widget, j*2 + 2, i)
         return graphics_layout
 
     def populate_eeg_graph_widget(self, widget: GraphicsLayoutWidget, game_name: str, player_name: PlayerName, electrode_name: str):
@@ -110,6 +121,7 @@ class AnalysisTab(QTabWidget):
         time = self._acquire_eeg_signal(game_name, player_name, 'time')
         plot = widget.addPlot()
         plot.plot(time, data, pen=mkPen({'color': "37AAD2"}))
+        plot.setTitle('Amplitude of the EEG signal for electrode %s'%ELECTRODES[electrode_name])
         plot.setLabel('bottom', "Time", units='s')
         plot.setLabel('left', "Amplitude", units='uV')
 
@@ -117,6 +129,7 @@ class AnalysisTab(QTabWidget):
         # https://stackoverflow.com/questions/51312923/plotting-the-spectrum-of-a-wavfile-in-pyqtgraph-using-scipy-signal-spectrogram
         f, t, Sxx = self._acquire_spectrogram_signal(game_name, player_name, electrode_name)
         plot = widget.addPlot()
+        plot.setTitle('Frequency over time for electrode %s'%ELECTRODES[electrode_name])
         img = ImageItem()
         plot.addItem(img)
         hist = HistogramLUTItem()
@@ -154,7 +167,7 @@ class AnalysisTab(QTabWidget):
 
     def _acquire_spectrogram_signal(self, game_name: str, player_name: PlayerName, electrode_name: str):
         eeg_signal = read_player_signal(game_name, player_name)
-        f, t, Sxx = signal.spectrogram(np.array(eeg_signal[electrode_name]), MUSE_EEG_ACQUISITION_FREQUENCY, nperseg=128, detrend='linear', scaling='density')
+        f, t, Sxx = signal.spectrogram(np.array(eeg_signal[electrode_name]), MUSE_EEG_ACQUISITION_FREQUENCY, nperseg=128, detrend='linear', scaling='spectrum')
         return self._remove_high_frequencies(f, t, Sxx)
 
     def _remove_high_frequencies(self, f, t, Sxx):

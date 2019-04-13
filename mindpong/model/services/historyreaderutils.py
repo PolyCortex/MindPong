@@ -11,9 +11,9 @@ def get_available_games():
     return [x.parts[1] for x in Path("History/").iterdir() if x.is_dir()]
 
 
-def read_player_signal(game_name: str, player_name: PlayerName):
+def read_player_signal(game_name: str, player_name: str):
     file_path = Path('History/%s/%s' %
-                     (game_name, player_name.value[0])).with_suffix('.csv')
+                     (game_name, player_name)).with_suffix('.csv')
     signals = [[] for _ in range(7)]
     last_not_nan_val = [0] * 7
     headers = []
