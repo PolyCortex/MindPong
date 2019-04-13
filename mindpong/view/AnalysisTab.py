@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QPalette
-from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, HistogramLUTItem
+from pyqtgraph import setConfigOptions, GraphicsLayoutWidget, ImageItem, HistogramLUTItem, PlotItem, mkPen
 
 from mindpong.model.services.historyreaderutils import read_player_signal, get_available_games
 from mindpong.model.player import PlayerName
@@ -38,6 +38,7 @@ class AnalysisTab(QTabWidget):
         self.analysisLayout = None
         self.graphics_layout = None
         self.spectrogram_widgets = []
+        self.eeg_graph_widgets = []
         self.init_ui()
 
     def init_ui(self):
@@ -86,7 +87,7 @@ class AnalysisTab(QTabWidget):
             line_edit.setReadOnly(True)
             self.game_selector.setLineEdit(line_edit)
         self.game_selector.update()
-    
+
     def create_graphics_layout(self, game_name: str):
         ELECTRODES_NUMBER = 4
         setConfigOptions(imageAxisOrder='row-major')
@@ -95,12 +96,24 @@ class AnalysisTab(QTabWidget):
         graphics_layout.setVerticalSpacing(60)
         for i, player_name in enumerate(PlayerName):
             for j in range(ELECTRODES_NUMBER):
+                row = 2 * j
+                eeg_graph_widget = GraphicsLayoutWidget()
                 spectrogram_widget = GraphicsLayoutWidget()
+                self.eeg_graph_widgets.append((eeg_graph_widget, player_name, j))
                 self.spectrogram_widgets.append((spectrogram_widget, player_name, j))
-                graphics_layout.addWidget(spectrogram_widget, j, i)
+                graphics_layout.addWidget(eeg_graph_widget, j, i)
+                graphics_layout.addWidget(spectrogram_widget, j + 4, i)
         return graphics_layout
 
-    def add_spectrogram_to_widget(self, widget: GraphicsLayoutWidget, game_name: str, player_name: PlayerName, electrode_name: str):
+    def populate_eeg_graph_widget(self, widget: GraphicsLayoutWidget, game_name: str, player_name: PlayerName, electrode_name: str):
+        data = self._acquire_eeg_signal(game_name, player_name, electrode_name)
+        time = self._acquire_eeg_signal(game_name, player_name, 'time')
+        plot = widget.addPlot()
+        plot.plot(time, data, pen=mkPen({'color': "37AAD2"}))
+        plot.setLabel('bottom', "Time", units='s')
+        plot.setLabel('left', "Amplitude", units='uV')
+
+    def populate_spectrogram_widget(self, widget: GraphicsLayoutWidget, game_name: str, player_name: PlayerName, electrode_name: str):
         # https://stackoverflow.com/questions/51312923/plotting-the-spectrum-of-a-wavfile-in-pyqtgraph-using-scipy-signal-spectrogram
         f, t, Sxx = self._acquire_spectrogram_signal(game_name, player_name, electrode_name)
         plot = widget.addPlot()
@@ -129,8 +142,15 @@ class AnalysisTab(QTabWidget):
         if len(selected_game) and self.spectrogram_widgets is not None:
             for spectrogram_widget in self.spectrogram_widgets:
                 spectrogram_widget[0].clear()
-                self.add_spectrogram_to_widget(spectrogram_widget[0], selected_game, spectrogram_widget[1], "electrode %i"%spectrogram_widget[2])
+                self.populate_spectrogram_widget(spectrogram_widget[0], selected_game, spectrogram_widget[1], "electrode %i"%spectrogram_widget[2])
+            for eeg_graph_widget in self.eeg_graph_widgets:
+                eeg_graph_widget[0].clear()
+                self.populate_eeg_graph_widget(eeg_graph_widget[0], selected_game, eeg_graph_widget[1], "electrode %i"%eeg_graph_widget[2])
             self.analysisLayout.update()
+
+    def _acquire_eeg_signal(self, game_name: str, player_name: PlayerName, field: str):
+        eeg_signal = read_player_signal(game_name, player_name)
+        return eeg_signal[field]
 
     def _acquire_spectrogram_signal(self, game_name: str, player_name: PlayerName, electrode_name: str):
         eeg_signal = read_player_signal(game_name, player_name)
