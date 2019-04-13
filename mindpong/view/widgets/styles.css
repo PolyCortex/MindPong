@@ -12,6 +12,10 @@ QPushButton#toggle_concentration {
     color: white;
 }
 
+QPushButton#toggle_relaxation {
+    background-color: rgb(255, 65, 65)
+}
+
 QComboBox {
     padding: 5px 10px; 
     margin: 30px 50px 0px 0px;

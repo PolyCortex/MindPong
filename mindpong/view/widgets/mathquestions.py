@@ -15,11 +15,17 @@ class MathQuestions(QWidget):
     INITIALIZING_TITLE = "Initializing..."
     CHECK_ANSWER_BUTTON_TITLE = 'Check Answer'
     NEXT_QUESTION_BUTTON_TITLE = 'Next Question'
-    TOGGLE_CONCENTRATION_BUTTON_TITLE = 'Concentration Mode'
+    CONCENTRATION_OBJ_NAME = "toggle_concentration"
+    CONCENTRATION_BUTTON_TITLE = 'Concentration Mode'
+    RELAXATION_OBJ_NAME = "toggle_relaxation"
+    RELAXATION_BUTTON_TITLE = 'Relaxation Mode'
+    RELAXATION_TITLE = "Please relax now..."
+    RELAXATION_BODY = "✋✋ 🧠🧠 ✋✋"
 
     def __init__(self):
         super().__init__()
         self.setFixedHeight(self.height() - 10)
+        self.is_relaxation_activated = False 
         self.init_ui()
 
     def init_ui(self):
@@ -64,17 +70,17 @@ class MathQuestions(QWidget):
         self.check_answer_button.clicked.connect(self._on_click_answer_button)
 
         # Toggle concentration button
-        self.toggle_concentration_button = QPushButton(self.TOGGLE_CONCENTRATION_BUTTON_TITLE)
-        self.toggle_concentration_button.setObjectName("toggle_concentration")
-        self.toggle_concentration_button.setMaximumWidth(self.toggle_concentration_button.width() * 0.4)
-        self.toggle_concentration_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
-        self.toggle_concentration_button.clicked.connect(self._on_click_toggle_concentration)
+        self.toggle_mode_button = QPushButton(self.CONCENTRATION_BUTTON_TITLE)
+        self.toggle_mode_button.setObjectName(self.CONCENTRATION_OBJ_NAME)
+        self.toggle_mode_button.setMaximumWidth(self.toggle_mode_button.width() * 0.4)
+        self.toggle_mode_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
+        self.toggle_mode_button.clicked.connect(self._on_click_toggle_mode)
 
         self.config_panel_layout.addWidget(self.mode_combo_box)
         self.config_panel_layout.addWidget(self.difficulty_combo_box)
         self.config_panel_layout.addSpacing(80)
         self.config_panel_layout.addWidget(self.check_answer_button)
-        self.config_panel_layout.addWidget(self.toggle_concentration_button)
+        self.config_panel_layout.addWidget(self.toggle_mode_button)
         self.grid.addLayout(self.config_panel_layout, 0, 1, 2, 1, (Qt.AlignVCenter))
 
     def _init_combo_box(self, items, changed_callback, tooltip):
@@ -109,8 +115,23 @@ class MathQuestions(QWidget):
             self.check_answer_button.setText(self.NEXT_QUESTION_BUTTON_TITLE)
             self._exercice_model.has_shown_answer = True
 
-    def _on_click_toggle_concentration(self, event):
-        pass
+    def _on_click_toggle_mode(self, event):
+        if self.is_relaxation_activated:
+            self._link_model()
+            self.toggle_mode_button.setText(self.RELAXATION_BUTTON_TITLE)
+            self.toggle_mode_button.setObjectName(self.CONCENTRATION_OBJ_NAME)
+            self.toggle_mode_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
+            self._enable_configuration_panel(False)
+            self.is_relaxation_activated = False
+            self._exercice_model.has_shown_answer = False
+        else:
+            self._math_question.setText(self.RELAXATION_TITLE)
+            self._equation_label.setText(self.RELAXATION_BODY)
+            self.toggle_mode_button.setText(self.CONCENTRATION_BUTTON_TITLE)
+            self.toggle_mode_button.setObjectName(self.RELAXATION_OBJ_NAME)
+            self.toggle_mode_button.setStyleSheet(open(STYLE_SHEET_PATH).read())
+            self._enable_configuration_panel(True)
+            self.is_relaxation_activated = True
 
     def _mode_changed(self, text):
         new_mode = MathMode(text)
@@ -127,6 +148,11 @@ class MathQuestions(QWidget):
             self._exercice_model.difficulty = MathQuestionDifficulty(text)
             self._exercice_model.update_question()
             self._link_model()
+
+    def _enable_configuration_panel(self, enable: bool):
+        self.check_answer_button.setDisabled(enable)
+        self.mode_combo_box.setDisabled(enable)
+        self.difficulty_combo_box.setDisabled(enable)
     
     def sizeHint(self):
         return QSize(self.width(), self.height())
