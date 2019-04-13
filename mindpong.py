@@ -1,6 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QStyleFactory
 
 from mindpong.view.MainMenu import MainMenu
 from mindpong.model.game import Game
@@ -10,6 +10,7 @@ from mindpong.delegate.delegate import Delegate
 
 def main():
     app = QApplication(sys.argv)
+    app.setStyle(QStyleFactory.create('Fusion'))
 
     # delegate
     delegate = Delegate()
@@ -21,7 +22,8 @@ def main():
     serial_communication = SerialCommunication()
     game = Game([
         lambda data: print('I am updating my data', data),
-        serial_communication.send_data
+        serial_communication.send_data,
+        menu.playTab.update_signal_event.emit,
     ])
 
     # bind view to model with delegate
