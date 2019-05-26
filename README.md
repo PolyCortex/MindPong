@@ -2,7 +2,7 @@
 
   
 
-MindPong is a fantastic EEG multiplayer game requiring two Muse headbands and an arduino board. The goal is to move a ball by controlling a fan with your brain. The more you are focused, the more the fan rotates. We are interested in beta waves in order to establish how much you are focused. It relies entirely on the [pyMuse](https://github.com/PolyCortex/pyMuse) library. It is mainly used as a mean to popularize EEG technologies and neurosciences to the public.
+MindPong is a fantastic EEG multiplayer game requiring two Muse headbands and an arduino board. The goal is to move a ball by controlling a fan with your brain. The more you are focused, the more the fan rotates. We are interested in beta waves in order to establish how much you are focused. It relies entirely on the [pyMuse](https://github.com/PolyCortex/pyMuse) library. It is mainly used as a mean to popularize EEG technologies and neurosciences to the public.  Visit the MindPong wiki for a detailed description of MindPong related projects and ongoing developments (https://github.com/PolyCortex/MindPong/wiki).
   
 ## Game
 
