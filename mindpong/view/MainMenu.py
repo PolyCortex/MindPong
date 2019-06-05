@@ -12,7 +12,10 @@ from mindpong.view.utils import MINDPONG_TITLE
 import sys
 import os
 import emoji
-from PyQt5.QtWidgets import QApplication, QDesktopWidget, QMainWindow, QTabWidget, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import (
+    QApplication, QDesktopWidget,
+    QMainWindow, QTabWidget, QVBoxLayout,
+    QWidget, QMessageBox)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
@@ -21,7 +24,8 @@ class MainMenu(QMainWindow):
 
     DEFAULT_MENU_HEIGHT = 800
     DEFAULT_MENU_WIDTH = 640
-    PLAY_TAB_INDEX = 1
+    PLAY_TAB_INDEX = 0
+    ANALYSIS_TAB_INDEX = 1
     SETTINGS_TAB_INDEX = 2
 
     def __init__(self):
@@ -34,6 +38,7 @@ class MainMenu(QMainWindow):
         self.analysisTab = AnalysisTab()
         self.playTab = PlayTab()
         self.settingsTab = SettingsTab()
+        self.errorBox = QMessageBox()
         # init methods
         self.init_ui()
         self.tabWidget.currentChanged.connect(self.onChange)
@@ -56,6 +61,8 @@ class MainMenu(QMainWindow):
         self.showMaximized()
         self.setWindowTitle(MINDPONG_TITLE)
         self.setWindowIcon(QIcon(self._logoPath))
+        self.errorBox.setIcon(QMessageBox.Warning)
+        self.errorBox.setWindowTitle(MINDPONG_TITLE)
 
     def init_tabs(self):
         self.tabWidget.addTab(self.playTab, emoji.emojize(":video_game: Play  "))
@@ -74,10 +81,15 @@ class MainMenu(QMainWindow):
         self.delegate.end_game()
     
     def onChange(self, tab_idx):
-        if tab_idx == self.PLAY_TAB_INDEX:
+        if tab_idx == self.ANALYSIS_TAB_INDEX:
             self.analysisTab.populate_game_selector()
         elif tab_idx == self.SETTINGS_TAB_INDEX:
-            self.settingsTab.populate_fields()
+            if self.delegate.game.state is GameState.IN_PLAY:
+                self.tabWidget.setCurrentIndex(self.PLAY_TAB_INDEX)
+                self.errorBox.setText("Error: please end the game before changing to settings tab")
+                self.errorBox.show()
+            else:
+                self.settingsTab.populate_fields()
 
 
 if __name__ == '__main__':

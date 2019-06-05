@@ -5,7 +5,7 @@ from serial import Serial, SerialException
 import numpy as np
 
 BAUD_RATE = 9600
-PORT = 'COM5'
+DEFAULT_PORT = 'COM4'
 READ_TIMEOUT = 1
 
 LOWER_BOUND = 0.01
@@ -17,8 +17,10 @@ class SerialCommunication():
 
     def __init__(self):
         self._serial_channel = Serial()
-        self._serial_channel.port = PORT
         self._serial_channel.baudrate = BAUD_RATE
+        available_ports = self.get_available_serial_ports()
+        self._serial_channel.port =  DEFAULT_PORT if len(available_ports) == 0 else available_ports[0]
+
 
     @property
     def baudrate(self):
@@ -31,9 +33,11 @@ class SerialCommunication():
         else:
             raise Exception("Close connection before changing baudrate")
 
+
     @property
     def port(self):
         return self._serial_channel.port
+
 
     @port.setter
     def set_port(self, new_port):
